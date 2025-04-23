@@ -1,0 +1,37 @@
+name: Enviar commit para Trello
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  comentar-no-trello:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checar código
+        uses: actions/checkout@v3
+
+      - name: Comentar no card do Trello com link do commit
+        run: |
+          # Obtém a mensagem do último commit
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          echo "Commit: $COMMIT_MSG"
+
+          # Extrai o ID do card do Trello (ex: #gxqmcIoh)
+          CARD_ID=$(echo "$COMMIT_MSG" | grep -oE '#[a-zA-Z0-9]+' | sed 's/#//')
+
+          if [ -n "$CARD_ID" ]; then
+            # Cria a URL do commit no GitHub
+            COMMIT_URL="https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
+            COMMENT="Novo commit na branch main: $COMMIT_MSG ($COMMIT_URL)"
+            
+            # Envia o comentário para o Trello
+            curl -X POST "https://api.trello.com/1/cards/$CARD_ID/actions/comments" \
+              -d "text=$COMMENT" \
+              -d "key=${{ secrets.TRELLO_API_SECRET }}" \
+              -d "token=${{ secrets.TRELLO_API_KEY }}"
+          else
+            echo "Nenhum ID de card encontrado no commit."
+          fi
