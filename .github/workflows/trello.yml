@@ -30,8 +30,8 @@ jobs:
             # Envia o comentário para o Trello
             curl -X POST "https://api.trello.com/1/cards/$CARD_ID/actions/comments" \
               -d "text=$COMMENT" \
-              -d "key=${{ secrets.TRELLO_API_SECRET }}" \
-              -d "token=${{ secrets.TRELLO_API_KEY }}"
+              -d "key=${{ secrets.TRELLO_KEY}}" \
+              -d "token=${{ secrets.TRELLO_TOKEN}}"
           else
             echo "Nenhum ID de card encontrado no commit."
           fi
