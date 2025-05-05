@@ -61,4 +61,11 @@ public class UserServiceImpl implements UserService {
 		Assert.notNull(save, "Erro ao atualizaro o usuário com o email: " + user.getEmail() + ".");
 		
 	}
+
+	public void delete(Long id) {
+		User user = userRepository.findById(id)
+				.orElseThrow(
+				() -> new ResourceNotFoundException("Usuário não encontrado com o id: " + id + "."));
+		userRepository.delete(user);
+	}
 }
