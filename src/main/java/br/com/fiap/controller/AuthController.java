@@ -35,12 +35,12 @@ public class AuthController {
 			@ApiResponse(responseCode = "401", description = "Credenciais inválidas, não autorizado")
 	})
 	public ResponseEntity<?> authorization(@Valid @RequestBody UserAuthorizationDTO userAuth) {
-		
+
 		User user = this.userService.getUserByEmail(userAuth.email());
-//		if(this.userService.verifyPassword(userAuth.password(), user.getPassword())) {
-//	       String token  = JwtTokenUtil.createToken();
-//	       return ResponseEntity.ok(token);
-//		}
+		if(this.userService.verifyPassword(userAuth.password(), user.getPassword())) {
+	       String token  = JwtTokenUtil.createToken();
+	       return ResponseEntity.ok(token);
+		}
 	   
 		return ResponseEntity.status(401).body("Não autorizado");
 	}

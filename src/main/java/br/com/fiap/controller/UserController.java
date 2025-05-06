@@ -8,10 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import br.com.fiap.services.ResourceNotFoundException;
 
+
+import br.com.fiap.dto.UserResponseDTO;
 import br.com.fiap.dto.UserDTO;
 import br.com.fiap.interfaces.services.UserService;
 import jakarta.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/users", produces = {"application/json"})
@@ -56,6 +60,28 @@ public class UserController {
 	public ResponseEntity<Void> delete(@PathVariable("id") Long id){
 		userService.delete(id);
 		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping
+	@Operation(summary = "Listar usuários",
+			description = "Lista todos os usuários cadastrados no sistema.")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Usuários listados com sucesso"),
+			@ApiResponse(responseCode = "500", description = "Erro interno ao listar usuários")
+	})
+	public ResponseEntity<List<UserResponseDTO>> list() {
+		return ResponseEntity.ok(userService.findAll());
+	}
+
+	@GetMapping("/{id}")
+	@Operation(summary = "Buscar usuário por ID",
+			description = "Retorna os dados de um usuário específico com base no ID fornecido.")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Usuário encontrado com sucesso"),
+			@ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+	})
+	public ResponseEntity<UserResponseDTO> findById(@PathVariable Long id) {
+		return ResponseEntity.ok(userService.getUserById(id));
 	}
 
 }
