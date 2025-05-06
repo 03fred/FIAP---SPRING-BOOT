@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
 		String passwordCrypto = this.passwordEncoder.encode(userDto.password());
 		User user = new User(userDto, UserType.USER, passwordCrypto);
 		var save = this.userRepository.save(user);
-		Assert.notNull(save, "Erro ao salvar o usuário com o email: " + user.getEmail() + ".");
+//		Assert.notNull(save, "Erro ao salvar o usuário com o email: " + user.getEmail() + ".");
 	}
 
 	@Override
@@ -52,13 +52,13 @@ public class UserServiceImpl implements UserService {
 		
 		String passwordCrypto = this.passwordEncoder.encode(userDto.password());
 		
-		user.setEmail(userDto.email());
-		user.setLogin(userDto.email());
-		user.setName(userDto.name());
-		user.setPassword(passwordCrypto);
+//		user.setEmail(userDto.email());
+//		user.setLogin(userDto.email());
+//		user.setName(userDto.name());
+//		user.setPassword(passwordCrypto);
 		
 		var save = this.userRepository.save(user);
-		Assert.notNull(save, "Erro ao atualizaro o usuário com o email: " + user.getEmail() + ".");
+//		Assert.notNull(save, "Erro ao atualizaro o usuário com o email: " + user.getEmail() + ".");
 		
 	}
 
