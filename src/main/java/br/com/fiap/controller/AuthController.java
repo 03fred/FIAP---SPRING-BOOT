@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.fiap.config.security.JwtTokenUtil;
 import br.com.fiap.dto.UserAuthorizationDTO;
-import br.com.fiap.interfaces.services.UserService;
+import br.com.fiap.interfaces.services.AuthService;
 import br.com.fiap.model.User;
 import jakarta.validation.Valid;
 
@@ -23,8 +24,7 @@ import jakarta.validation.Valid;
 public class AuthController {
 	
 	@Autowired
-	private UserService userService;
-	
+	private AuthService authService;
 
 	@PostMapping
 	@Operation(summary = "Autenticação de usuário.",
@@ -36,8 +36,8 @@ public class AuthController {
 	})
 	public ResponseEntity<?> authorization(@Valid @RequestBody UserAuthorizationDTO userAuth) {
 
-		User user = this.userService.getUserByEmail(userAuth.email());
-		if(this.userService.verifyPassword(userAuth.password(), user.getPassword())) {
+		User user = this.authService.getUserByEmail(userAuth.email());
+		if(this.authService.verifyPassword(userAuth.password(), user.getPassword())) {
 	       String token  = JwtTokenUtil.createToken();
 	       return ResponseEntity.ok(token);
 		}

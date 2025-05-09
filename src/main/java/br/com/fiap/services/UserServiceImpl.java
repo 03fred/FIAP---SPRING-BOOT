@@ -1,5 +1,6 @@
 package br.com.fiap.services;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -7,11 +8,15 @@ import org.springframework.util.Assert;
 
 import br.com.fiap.dto.UserResponseDTO;
 import br.com.fiap.dto.UserDTO;
+
 import br.com.fiap.interfaces.repositories.UserRepository;
 import br.com.fiap.interfaces.services.UserService;
+
 import br.com.fiap.model.User;
 import br.com.fiap.model.enums.UserType;
+
 import java.util.List;
+
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -21,17 +26,6 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-
-	@Override
-	public boolean verifyPassword(String password, String passwordDatabase) {
-		return passwordEncoder.matches(password, passwordDatabase);
-	}
-
-	@Override
-	public User getUserByEmail(String email) {
-		return userRepository.findByEmail(email)
-				.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o email: " + email));
-	}
 
 	@Override
 	public void save(UserDTO userDto) {
