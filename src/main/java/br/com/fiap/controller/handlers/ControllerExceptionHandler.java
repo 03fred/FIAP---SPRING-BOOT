@@ -19,7 +19,7 @@ import org.springframework.web.context.request.WebRequest;
 import br.com.fiap.dto.HttpMessageNotReadableExceptionDTO;
 import br.com.fiap.dto.ResourceNotFoundDTO;
 import br.com.fiap.dto.ValidationErrorDto;
-import br.com.fiap.services.ResourceNotFoundException;
+import br.com.fiap.exceptions.ResourceNotFoundException;
 
 @ControllerAdvice
 public class ControllerExceptionHandler {

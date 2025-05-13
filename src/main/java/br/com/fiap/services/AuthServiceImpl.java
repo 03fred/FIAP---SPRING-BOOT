@@ -1,15 +1,13 @@
 package br.com.fiap.services;
 
-
+import br.com.fiap.exceptions.ResourceNotFoundException;
 import br.com.fiap.interfaces.repositories.UserRepository;
 import br.com.fiap.interfaces.services.AuthService;
-
 import br.com.fiap.model.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -28,7 +26,12 @@ public class AuthServiceImpl implements AuthService {
 	@Override
 	public User getUserByEmail(String email) {
 		return userRepository.findByEmail(email)
-				.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o email: " + email));
+				.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o e-mail: " + email));
 	}
 
+	@Override
+	public User getUserByLogin(String login) {
+		return userRepository.findByLogin(login)
+				.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o login: " + login));
+	}
 }

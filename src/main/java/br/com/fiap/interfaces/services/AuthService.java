@@ -7,6 +7,8 @@ public interface AuthService {
 
 	User getUserByEmail(String email);
 
+	User getUserByLogin(String login);
+
 	boolean verifyPassword(String password, String passwordDatabase);
 
 }

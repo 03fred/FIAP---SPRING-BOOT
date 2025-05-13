@@ -1,6 +1,9 @@
 package br.com.fiap.services;
 
 
+import br.com.fiap.exceptions.ConflictException;
+import br.com.fiap.exceptions.ResourceNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,6 +32,15 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void save(UserDTO userDto) {
+
+		if (userRepository.existsByEmail(userDto.email())) {
+			throw new ConflictException("Email já existente");
+		}
+
+		if (userRepository.existsByLogin(userDto.login())) {
+			throw new ConflictException("Login já existente");
+		}
+
 		String passwordCrypto = this.passwordEncoder.encode(userDto.password());
 		User user = new User(userDto, UserType.USER, passwordCrypto);
 		var save = this.userRepository.save(user);
