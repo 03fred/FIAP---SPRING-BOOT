@@ -75,16 +75,10 @@ public class UserServiceImpl implements UserService {
 	}
 
 	public Page<UserResponseDTO> getAllUsers(Pageable pageable) {
-		// Fetch a page of User entities
 		Page<User> userPage = userRepository.findAll(pageable);
-
-		// Map the content of the Page to UserResponseDTOs
 		List<UserResponseDTO> userResponseDTOs = userPage.getContent().stream()
 				.map(user -> new UserResponseDTO(user.getId(), user.getEmail(), user.getName(), user.getAddress()))
 				.collect(Collectors.toList());
-
-		// Create a new PageImpl with the mapped DTOs,
-		// maintaining the pagination information from the original page
 		return new PageImpl<>(userResponseDTOs, userPage.getPageable(), userPage.getTotalElements());
 	}
 	
