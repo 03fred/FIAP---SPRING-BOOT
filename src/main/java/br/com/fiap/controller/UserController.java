@@ -1,23 +1,33 @@
 package br.com.fiap.controller;
 
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import br.com.fiap.dto.UserDTO;
+import br.com.fiap.dto.UserResponseDTO;
+import br.com.fiap.interfaces.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import br.com.fiap.dto.UserResponseDTO;
-import br.com.fiap.dto.UserDTO;
-import br.com.fiap.interfaces.services.UserService;
-
 import jakarta.validation.Valid;
-
-import java.util.List;
-import java.util.Map;
 
 
 
@@ -68,14 +78,20 @@ public class UserController {
 	}
 
 	@GetMapping
-	@Operation(summary = "Listar usuários",
-			description = "Lista todos os usuários cadastrados no sistema.")
-	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "Usuários listados com sucesso"),
-			@ApiResponse(responseCode = "500", description = "Erro interno ao listar usuários")
-	})
-	public ResponseEntity<List<UserResponseDTO>> list() {
-		return ResponseEntity.ok(userService.findAll());
+	@Operation(summary = "Listar usuários", description = "Lista todos os usuários cadastrados no sistema.")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Usuários listados com sucesso"),
+			@ApiResponse(responseCode = "500", description = "Erro interno ao listar usuários") })
+
+	@Parameter(in = ParameterIn.QUERY, description = "Página atual", name = "page", schema = @Schema(type = "integer", defaultValue = "0"))
+	@Parameter(in = ParameterIn.QUERY, description = "Número total de itens por página", name = "size", schema = @Schema(type = "integer", defaultValue = "10"))
+	@Parameter(in = ParameterIn.QUERY, description = "Ordenação no formato (asc|desc). "
+			+ "Por padrão é asc. "
+			+ "Multiplas ordenações são suportadas.", name = "sort", array = @ArraySchema(schema = @Schema(type = "string", example = "name,asc")),
+			required = false)
+
+	public ResponseEntity<Page<UserResponseDTO>> getAllUsers(@Parameter(hidden = true) Pageable pageable) {
+		Page<UserResponseDTO> userPage = userService.getAllUsers(pageable);
+		return ResponseEntity.ok(userPage);
 	}
 
 	@GetMapping("/{id}")
