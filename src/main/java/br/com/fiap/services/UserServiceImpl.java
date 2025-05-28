@@ -6,12 +6,12 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import br.com.fiap.dto.PaginatedResponseDTO;
 import br.com.fiap.dto.UserDTO;
 import br.com.fiap.dto.UserResponseDTO;
 import br.com.fiap.exceptions.ConflictException;
@@ -74,12 +74,18 @@ public class UserServiceImpl implements UserService {
 		userRepository.delete(user);
 	}
 
-	public Page<UserResponseDTO> getAllUsers(Pageable pageable) {
+	public PaginatedResponseDTO<UserResponseDTO> getAllUsers(Pageable pageable) {
 		Page<User> userPage = userRepository.findAll(pageable);
 		List<UserResponseDTO> userResponseDTOs = userPage.getContent().stream()
 				.map(user -> new UserResponseDTO(user.getId(), user.getEmail(), user.getName(), user.getAddress()))
 				.collect(Collectors.toList());
-		return new PageImpl<>(userResponseDTOs, userPage.getPageable(), userPage.getTotalElements());
+		
+		return new PaginatedResponseDTO<>(
+                userResponseDTOs,
+                userPage.getTotalElements(),
+                userPage.getNumber(), 
+                userPage.getSize()   
+        );
 	}
 	
 	@Override

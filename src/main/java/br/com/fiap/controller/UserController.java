@@ -3,7 +3,6 @@ package br.com.fiap.controller;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.fiap.dto.PaginatedResponseDTO;
 import br.com.fiap.dto.UserDTO;
 import br.com.fiap.dto.UserResponseDTO;
 import br.com.fiap.interfaces.services.UserService;
@@ -89,8 +89,8 @@ public class UserController {
 			+ "Multiplas ordenações são suportadas.", name = "sort", array = @ArraySchema(schema = @Schema(type = "string", example = "name,asc")),
 			required = false)
 
-	public ResponseEntity<Page<UserResponseDTO>> getAllUsers(@Parameter(hidden = true) Pageable pageable) {
-		Page<UserResponseDTO> userPage = userService.getAllUsers(pageable);
+	public ResponseEntity<PaginatedResponseDTO<UserResponseDTO>> getAllUsers(@Parameter(hidden = true) Pageable pageable) {
+		PaginatedResponseDTO<UserResponseDTO> userPage = userService.getAllUsers(pageable);
 		return ResponseEntity.ok(userPage);
 	}
 

@@ -1,8 +1,8 @@
 package br.com.fiap.interfaces.services;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import br.com.fiap.dto.PaginatedResponseDTO;
 import br.com.fiap.dto.UserDTO;
 import br.com.fiap.dto.UserResponseDTO;
 
@@ -15,7 +15,7 @@ public interface UserService {
 
 	void delete(Long id);
 
-	Page<UserResponseDTO> getAllUsers(Pageable pageable);
+	PaginatedResponseDTO<UserResponseDTO> getAllUsers(Pageable pageable);
 
 	UserResponseDTO getUserById(Long id);
 
