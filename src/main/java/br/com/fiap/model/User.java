@@ -1,20 +1,12 @@
 package br.com.fiap.model;
 
 import java.util.Date;
+import java.util.List;
 
 import br.com.fiap.dto.UserDTO;
 import br.com.fiap.model.enums.UserType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity; // Import the correct @Entity annotation
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id; // Import the correct @Id annotation
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table; // Optional, but good practice for naming the table
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -31,7 +23,6 @@ import lombok.ToString;
 @Entity 
 @Table(name = "users") 
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -63,6 +54,10 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(name = "user_type", nullable = false)
     private UserType userType;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @OneToMany(mappedBy = "restaurantOwner", fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Restaurant> restaurants;
     
     
     public User(UserDTO userDto, UserType userType, String passwordCrypto) {
