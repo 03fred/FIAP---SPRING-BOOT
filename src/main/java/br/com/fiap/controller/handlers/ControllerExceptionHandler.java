@@ -18,8 +18,8 @@ import org.springframework.web.context.request.WebRequest;
 
 import br.com.fiap.dto.HttpMessageNotReadableExceptionDTO;
 import br.com.fiap.dto.ResourceNotFoundDTO;
-import br.com.fiap.dto.ValidationErrorDto;
-import br.com.fiap.services.ResourceNotFoundException;
+import br.com.fiap.dto.ValidationErrorDTO;
+import br.com.fiap.exceptions.ResourceNotFoundException;
 
 @ControllerAdvice
 public class ControllerExceptionHandler {
@@ -32,14 +32,14 @@ public class ControllerExceptionHandler {
 	}
 	
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<ValidationErrorDto> handlerMethodArgumentNotValidException(MethodArgumentNotValidException e){
+	public ResponseEntity<ValidationErrorDTO> handlerMethodArgumentNotValidException(MethodArgumentNotValidException e){
 		var statusCode = HttpStatus.BAD_REQUEST;
 		List<String> errors = new ArrayList<>();
 		
 		for(var erro : e.getBindingResult().getFieldErrors()) {
 			errors.add(erro.getField() + " : " + erro.getDefaultMessage());
 		}
-		return ResponseEntity.status(statusCode.value()).body(new ValidationErrorDto(errors, statusCode.value()));
+		return ResponseEntity.status(statusCode.value()).body(new ValidationErrorDTO(errors, statusCode.value()));
 	}
 	
 	@ExceptionHandler(HttpMessageNotReadableException.class)

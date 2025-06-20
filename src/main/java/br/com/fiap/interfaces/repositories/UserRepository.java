@@ -9,4 +9,11 @@ import br.com.fiap.model.User;
 public interface UserRepository extends JpaRepository<User, Long>{
 
     Optional<User> findByEmail(String email);
+
+    Optional<User> findByLogin(String login);
+
+    boolean existsByEmail(String email);
+
+    boolean existsByLogin(String login);
+
 }

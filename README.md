@@ -5,7 +5,7 @@ Este projeto é um backend desenvolvido em Spring Boot para gerenciamento de usu
 
 ## 🛠️ Tecnologias
 
-- Java 17  
+- Java 21  
 - Spring Boot  
 - MySQL  
 - Docker + Docker Compose  

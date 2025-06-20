@@ -3,8 +3,9 @@ package br.com.fiap.dto;
 import jakarta.validation.constraints.NotNull;
 
 public record UserAuthorizationDTO(
-		@NotNull(message = "O Email não pode ser null") 
-		String email,
-		@NotNull(message = "A senha não pode ser null") 
-		String password) {
-}
+		@NotNull(message = "O identificador (e-mail ou login) é obrigatório")
+		String identificador,
+		@NotNull(message = "A senha é obrigatória")
+		String password
+){}
+
