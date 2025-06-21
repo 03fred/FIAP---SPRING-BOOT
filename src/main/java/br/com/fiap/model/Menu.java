@@ -33,6 +33,6 @@ public class Menu {
     private String fotoPrato;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "restaurant_id", nullable = false)
-    private Restaurant restaurant;
+    @JoinColumn(name = "restaurante_id", nullable = false)
+    private Restaurante restaurante;
 }

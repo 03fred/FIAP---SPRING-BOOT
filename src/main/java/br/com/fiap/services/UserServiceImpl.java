@@ -1,7 +1,8 @@
 package br.com.fiap.services;
 
-
 import java.util.List;
+import java.util.Optional;
+
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import br.com.fiap.dto.PaginatedResponseDTO;
 import br.com.fiap.dto.UserDTO;
@@ -19,7 +19,8 @@ import br.com.fiap.exceptions.ResourceNotFoundException;
 import br.com.fiap.interfaces.repositories.UserRepository;
 import br.com.fiap.interfaces.services.UserService;
 import br.com.fiap.model.User;
-import br.com.fiap.model.enums.UserType;
+import br.com.fiap.model.enums.EnumType;
+import org.springframework.util.Assert;
 
 
 @Service
@@ -43,7 +44,7 @@ public class UserServiceImpl implements UserService {
 		}
 
 		String passwordCrypto = this.passwordEncoder.encode(userDto.password());
-		User user = new User(userDto, UserType.USER, passwordCrypto);
+		User user = new User(userDto, EnumType.USER, passwordCrypto);
 		var save = this.userRepository.save(user);
 //		Assert.notNull(save, "Erro ao salvar o usuário com o email: " + user.getEmail() + ".");
 	}

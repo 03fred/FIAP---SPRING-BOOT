@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import br.com.fiap.dto.UserDTO;
-import br.com.fiap.model.enums.UserType;
+import br.com.fiap.model.enums.EnumType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -51,23 +51,23 @@ public class User {
     @Column(nullable = false)
     private String address;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(jakarta.persistence.EnumType.STRING)
     @Column(name = "user_type", nullable = false)
-    private UserType userType;
+    private EnumType enumType;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @OneToMany(mappedBy = "restaurantOwner", fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<Restaurant> restaurants;
+    @OneToMany(mappedBy = "restauranteOwner", fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Restaurante> restaurantes;
     
     
-    public User(UserDTO userDto, UserType userType, String passwordCrypto) {
+    public User(UserDTO userDto, EnumType enumType, String passwordCrypto) {
     	this.email = userDto.email();
     	this.name = userDto.name();
     	this.login = userDto.login();
     	this.password = passwordCrypto;
     	this.address = userDto.address();
     	this.dtUpdateRow = new Date();
-    	this.userType = userType;
+    	this.enumType = enumType;
     	
     }
 }
