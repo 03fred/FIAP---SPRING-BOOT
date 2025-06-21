@@ -1,10 +1,13 @@
 package br.com.fiap.interfaces.services;
 
+import br.com.fiap.model.User;
 import org.springframework.data.domain.Pageable;
 
 import br.com.fiap.dto.PaginatedResponseDTO;
 import br.com.fiap.dto.UserDTO;
 import br.com.fiap.dto.UserResponseDTO;
+
+import java.util.Optional;
 
 
 public interface UserService {
@@ -18,5 +21,7 @@ public interface UserService {
 	PaginatedResponseDTO<UserResponseDTO> getAllUsers(Pageable pageable);
 
 	UserResponseDTO getUserById(Long id);
+
+	Optional<User> getUser(Long id);
 
 }

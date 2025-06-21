@@ -2,6 +2,8 @@ package br.com.fiap.model;
 
 import br.com.fiap.dto.RestauranteDTO;
 import br.com.fiap.model.enums.EnumType;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,6 +35,7 @@ public class Restaurante {
     @Column
     private String horarioFuncionamento;
 
+    @JsonManagedReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurante_owner_id", nullable = false)
     private User restauranteOwner;
@@ -46,6 +49,11 @@ public class Restaurante {
         this.nome = restauranteDTO.nome();
         this.tipoCozinha = restauranteDTO.tipoCozinha();
         this.restauranteOwner = user;
+    }
+
+    @Override
+    public String toString() {
+        return "Restaurante{id=" + id + ", nome='" + nome + "', endereco='" + endereco + "', tipoCozinha='" + tipoCozinha + "', restauranteOwner=" + (restauranteOwner != null ? restauranteOwner.getId() : null) + "}";
     }
 
 }

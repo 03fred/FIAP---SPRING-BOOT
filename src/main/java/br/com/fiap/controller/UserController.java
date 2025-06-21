@@ -104,16 +104,4 @@ public class UserController {
 		return ResponseEntity.ok(userService.getUserById(id));
 	}
 
-	@GetMapping
-	@Operation(summary = "Buscar todos os usuários",
-			description = "Retorna uma lista com todos os usuários cadastrados.")
-	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "Usuários encontrados com sucesso"),
-			@ApiResponse(responseCode = "500", description = "Erro interno no servidor")
-	})
-	public ResponseEntity<List<UserDTO>> findAll() {
-		List<UserDTO> users = userService.findAll();
-		return ResponseEntity.ok(users);
-	}
-
 }

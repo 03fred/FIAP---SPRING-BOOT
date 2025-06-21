@@ -1,8 +1,8 @@
 package br.com.fiap.services;
 
 import java.util.List;
-import java.util.Optional;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,6 +100,12 @@ public class UserServiceImpl implements UserService {
 				user.getName(),
 				user.getAddress()
 		);
+	}
+
+	@Override
+	public Optional<User> getUser(Long id) {
+		return Optional.ofNullable(userRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o id: " + id)));
 	}
 
 }

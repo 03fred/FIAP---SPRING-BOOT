@@ -1,7 +1,7 @@
 package br.com.fiap.services;
 
 import br.com.fiap.dto.RestauranteDTO;
-import br.com.fiap.dto.UserResponseDTO;
+import br.com.fiap.exceptions.ResourceNotFoundException;
 import br.com.fiap.interfaces.repositories.RestauranteRepository;
 import br.com.fiap.interfaces.services.RestauranteService;
 import br.com.fiap.interfaces.services.UserService;
@@ -28,15 +28,12 @@ public class RestauranteServiceImpl implements RestauranteService {
 
 	@Override
 	public void save(RestauranteDTO restauranteDTO, Long codigoProprietario) {
-		UserResponseDTO userResponseDTO = userService.getUserById(Long.valueOf(codigoProprietario));
-		//Criar um tratamento de excecao caso não existe proprietario cadastrado no banco.
-		if (userResponseDTO != null) {
-			// converter para entity
-			//Restaurante restaurante = new Restaurante(restauranteDTO, userResponseDTO);
-			//restauranteRepository.save(restaurante);
+		Optional<User> user = userService.getUser(Long.valueOf(codigoProprietario));
+		if (user.isPresent()) {
+			Restaurante restaurante = new Restaurante(restauranteDTO, user.get());
+			restauranteRepository.save(restaurante);
 		}
 	}
-
 
 	@Override
 	public Optional<RestauranteDTO> getRestauranteById(Long id) {
@@ -45,11 +42,22 @@ public class RestauranteServiceImpl implements RestauranteService {
 
 	@Override
 	public void update(RestauranteDTO restauranteDTO, Long id) {
+		Restaurante restaurante = restauranteRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Restaurante não encontrado com o id: " + id));
 
+		restaurante.setEndereco(restauranteDTO.endereco());
+		restaurante.setNome(restauranteDTO.endereco());
+		restaurante.setHorarioFuncionamento(restauranteDTO.endereco());
+		restaurante.setTipoCozinha(restauranteDTO.tipoCozinha());
+
+		restauranteRepository.save(restaurante);
 	}
 
 	@Override
 	public void delete(Long id) {
-
+		Restaurante restaurante = restauranteRepository.findById(id)
+				.orElseThrow(
+						() -> new ResourceNotFoundException("Restaurante não encontrado com o id: " + id + "."));
+		restauranteRepository.delete(restaurante);
 	}
 }

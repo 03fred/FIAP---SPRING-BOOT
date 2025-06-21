@@ -5,6 +5,7 @@ import java.util.List;
 
 import br.com.fiap.dto.UserDTO;
 import br.com.fiap.model.enums.EnumType;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -55,6 +56,7 @@ public class User {
     @Column(name = "user_type", nullable = false)
     private EnumType enumType;
 
+    @JsonBackReference
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @OneToMany(mappedBy = "restauranteOwner", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Restaurante> restaurantes;
