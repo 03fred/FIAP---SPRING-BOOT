@@ -3,7 +3,7 @@ name: Enviar commit para Trello
 on:
   push:
     branches:
-      - main
+      - develop
 
 jobs:
   comentar-no-trello:
