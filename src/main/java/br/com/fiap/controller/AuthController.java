@@ -1,14 +1,7 @@
 package br.com.fiap.controller;
 
 
-import jakarta.validation.Valid;
-
-import java.util.Map;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
+// Removed Swagger imports from here
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,25 +14,20 @@ import br.com.fiap.config.security.JwtTokenUtil;
 import br.com.fiap.dto.UserAuthorizationDTO;
 import br.com.fiap.exceptions.ResourceNotFoundException;
 import br.com.fiap.interfaces.services.AuthService;
+import br.com.fiap.interfaces.swagger.AuthApi;
 import br.com.fiap.model.User;
+import jakarta.validation.Valid;
 
 
 @RestController
 @RequestMapping(value = "/auth", produces = {"application/json"})
-@Tag(name = "Autenticação")
-public class AuthController {
+public class AuthController implements AuthApi { 
 
 	@Autowired
 	private AuthService authService;
 
+	@Override 
 	@PostMapping
-	@Operation(summary = "Autenticação de usuário.",
-			description = "Recebe senha e e-mail ou nome de usuário, a escolha do próprio usuário, e retorna um token JWT caso as credenciais estejam corretas.",
-			method = "POST")
-	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "Autenticação bem-sucedida, token JWT retornado"),
-			@ApiResponse(responseCode = "401", description = "Credenciais inválidas, não autorizado")
-	})
 	public ResponseEntity<?> authorization(@Valid @RequestBody UserAuthorizationDTO userAuth) {
 		User user = null;
 
@@ -53,7 +41,7 @@ public class AuthController {
 			return ResponseEntity.status(401).body("Credenciais inválidas, não autorizado.");
 		}
 
-		if (authService.verifyPassword(userAuth.password(), user.getPassword())) {
+		if (user != null && authService.verifyPassword(userAuth.password(), user.getPassword())) {
 			String token = JwtTokenUtil.createToken();
 			return ResponseEntity.ok(token);
 		}
