@@ -1,10 +1,12 @@
 package br.com.fiap.services;
 
 import br.com.fiap.dto.RestaurantDTO;
+import br.com.fiap.exceptions.ResourceNotFoundException;
 import br.com.fiap.interfaces.repositories.RestaurantRepository;
 import br.com.fiap.interfaces.services.UserService;
 import br.com.fiap.model.Restaurant;
 import br.com.fiap.model.User;
+import br.com.fiap.utils.TestDataFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,24 +33,29 @@ public class RestaurantServiceImplTest {
     @Test
     public void shouldSaveRestaurantWithOwnerId() {
         //Arrange
-         Long ownerId = 1L;
+        User owner = TestDataFactory.createUser(1L);
+        RestaurantDTO restaurantDTO = TestDataFactory.createRestaurantDTO();
 
-         User owner = new User();
-         owner.setId(ownerId);
-
-         RestaurantDTO restaurantDTO = new RestaurantDTO(
-                         "Ana",
-                         "Address 1",
-                         "Fast Food",
-                         "11 am");
-
-         when(userService.getUser(ownerId)).thenReturn(Optional.of(owner));
+         when(userService.getUser(owner.getId())).thenReturn(Optional.of(owner));
 
          //Act
         restaurantServiceImpl.save(restaurantDTO, owner.getId());
 
         //Assert
         verify(restaurantRepository, times(1)).save(any(Restaurant.class));
+    }
 
+    @Test
+    public void shouldThrowExceptionWhenOwnerIsNotFound() {
+        User owner = TestDataFactory.createUser(1L);
+        RestaurantDTO restaurantDTO = TestDataFactory.createRestaurantDTO();
+
+        when(userService.getUser(owner.getId())).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> restaurantServiceImpl.save(restaurantDTO, owner.getId())
+        );
+
+        verify(restaurantRepository, never()).save(any());
     }
 }
