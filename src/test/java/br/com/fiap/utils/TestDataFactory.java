@@ -24,13 +24,13 @@ public class TestDataFactory {
 
     public static Restaurant createRestaurant() {
         return new Restaurant(
-                1L, // id
-                "Ana", // name
-                "Address 1", // address
-                "Fast Food", // typeKitchen
-                "11 am", // openingHours
-                createUser(1L), // restaurantOwner
-                new ArrayList<>() // menus
+                1L,
+                "Ana",
+                "Address 1",
+                "Fast Food",
+                "11 am",
+                createUser(1L),
+                new ArrayList<>()
         );
     }
 }
