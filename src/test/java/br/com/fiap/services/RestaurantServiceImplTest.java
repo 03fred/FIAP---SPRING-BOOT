@@ -1,6 +1,7 @@
 package br.com.fiap.services;
 
 import br.com.fiap.dto.RestaurantDTO;
+import br.com.fiap.dto.RestaurantResponseDTO;
 import br.com.fiap.exceptions.ResourceNotFoundException;
 import br.com.fiap.interfaces.repositories.RestaurantRepository;
 import br.com.fiap.interfaces.services.UserService;
@@ -15,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -57,5 +59,30 @@ public class RestaurantServiceImplTest {
         );
 
         verify(restaurantRepository, never()).save(any());
+    }
+
+    @Test
+    public void shouldReturnRestaurantWhenFoundById(){
+        Long restaurantId = 1L;
+
+        Restaurant restaurant = TestDataFactory.createRestaurant();
+
+        when(restaurantRepository.findById(restaurantId)).thenReturn(Optional.of(restaurant));
+
+        RestaurantResponseDTO response = restaurantServiceImpl.getRestaurantById(restaurantId);
+
+        assertEquals("Ana", response.name());
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenNotFoundById(){
+        Long restaurantId = 1L;
+
+        when(restaurantRepository.findById(restaurantId)).thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> restaurantServiceImpl.getRestaurantById(restaurantId));
+
+        assertEquals("Restaurant not found with id: " + restaurantId, exception.getMessage());
     }
 }
