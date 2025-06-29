@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/restaurante", produces = {"application/json"})
+@RequestMapping(value = "/restaurant", produces = {"application/json"})
 @Tag(name = "Restaurante")
 public class RestauranteController implements RestaurantApi{
 
@@ -30,8 +30,8 @@ public class RestauranteController implements RestaurantApi{
 	
 	@Override
 	@PostMapping
-	public ResponseEntity<Void> save(@Valid @RequestBody RestaurantDTO restaurantDTO, Long codigoProprietario) {
-		this.restaurantService.save(restaurantDTO, codigoProprietario);
+	public ResponseEntity<Void> save(@Valid @RequestBody RestaurantDTO restaurantDTO, Long ownerId) {
+		this.restaurantService.save(restaurantDTO, ownerId);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	
@@ -52,7 +52,7 @@ public class RestauranteController implements RestaurantApi{
 	@Override
 	@GetMapping
 	public ResponseEntity<PaginatedResponseDTO<RestaurantResponseDTO>> getAllRestaurants(Pageable pageable) {
-		PaginatedResponseDTO<RestaurantResponseDTO> restaurantPage = restaurantService.getAllUsers(pageable);
+		PaginatedResponseDTO<RestaurantResponseDTO> restaurantPage = restaurantService.getAllRestaurants(pageable);
 		return ResponseEntity.ok(restaurantPage);
 	}
 

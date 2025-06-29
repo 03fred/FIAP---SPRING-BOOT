@@ -16,7 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,18 +32,18 @@ public class RestaurantServiceImpl implements RestaurantService {
 
 
 	@Override
-	public void save(RestaurantDTO restaurantDTO, Long codigoProprietario) {
-		Optional<User> user = userService.getUser(Long.valueOf(codigoProprietario));
-		if (user.isPresent()) {
-			Restaurant restaurant = new Restaurant(restaurantDTO, user.get());
-			restaurantRepository.save(restaurant);
-		}
+	public void save(RestaurantDTO restaurantDTO, Long ownerId) {
+		User owner = userService.getUser(ownerId).orElseThrow(
+						() -> new ResourceNotFoundException("Owner with " + ownerId + " was not found"));
+
+		Restaurant restaurant = new Restaurant(restaurantDTO, owner);
+		restaurantRepository.save(restaurant);
 	}
 
 	@Override
 	public RestaurantResponseDTO getRestaurantById(Long id) {
-		var restaurant = restaurantRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Restaurante não encontrado com o id: " + id));
+		Restaurant restaurant = restaurantRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Restaurant with " + id + " was not found"));
 
 		return new RestaurantResponseDTO(
 				restaurant.getName(),
@@ -57,7 +56,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 	@Override
 	public void update(RestaurantDTO restaurantDTO, Long id) {
 		Restaurant restaurant = restaurantRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Restaurante não encontrado com o id: " + id));
+				.orElseThrow(() -> new ResourceNotFoundException("Restaurant with " + id + " was not found"));
 
 		restaurant.setAddress(restaurantDTO.adress());
 		restaurant.setName(restaurantDTO.name());
@@ -71,15 +70,19 @@ public class RestaurantServiceImpl implements RestaurantService {
 	public void delete(Long id) {
 		Restaurant restaurant = restaurantRepository.findById(id)
 				.orElseThrow(
-						() -> new ResourceNotFoundException("Restaurante não encontrado com o id: " + id + "."));
+						() -> new ResourceNotFoundException("Restaurant with " + id + " was not found"));
 		restaurantRepository.delete(restaurant);
 	}
 
 	@Override
-	public PaginatedResponseDTO<RestaurantResponseDTO> getAllUsers(Pageable pageable) {
+	public PaginatedResponseDTO<RestaurantResponseDTO> getAllRestaurants(Pageable pageable) {
 		Page<Restaurant> restaurantPage = restaurantRepository.findAll(pageable);
+
 		List<RestaurantResponseDTO> restaurantResponseDTOS = restaurantPage.getContent().stream()
-				.map(restaurant -> new RestaurantResponseDTO(restaurant.getName(), restaurant.getAddress(), restaurant.getOpeningHours(),
+				.map(restaurant -> new RestaurantResponseDTO(
+						restaurant.getName(),
+						restaurant.getAddress(),
+						restaurant.getOpeningHours(),
 						restaurant.getTypeKitchen()))
 				.collect(Collectors.toList());
 

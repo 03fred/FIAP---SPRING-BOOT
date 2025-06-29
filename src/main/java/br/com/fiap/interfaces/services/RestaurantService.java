@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface RestaurantService {
 	
-	void save(RestaurantDTO restaurantDTO, Long codigoProprietario);
+	void save(RestaurantDTO restaurantDTO, Long ownerId);
 	
 	RestaurantResponseDTO getRestaurantById(Long id);
 
@@ -15,5 +15,5 @@ public interface RestaurantService {
 
 	void delete(Long id);
 
-	PaginatedResponseDTO<RestaurantResponseDTO> getAllUsers(Pageable pageable);
+	PaginatedResponseDTO<RestaurantResponseDTO> getAllRestaurants(Pageable pageable);
 }
