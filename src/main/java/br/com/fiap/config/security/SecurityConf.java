@@ -21,7 +21,7 @@ public class SecurityConf {
 	                        req -> req.requestMatchers(
 									"/h2-console/**",
 											"/users/**",
-											"/restaurante/**",
+											"/restaurant/**",
 											"/auth/**",
 											"/v3/api-docs/**",
 											"/swagger-ui/**",

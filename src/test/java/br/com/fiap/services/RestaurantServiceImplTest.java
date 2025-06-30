@@ -90,7 +90,7 @@ public class RestaurantServiceImplTest {
         ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
                 () -> restaurantServiceImpl.getRestaurantById(restaurantId));
 
-        assertEquals("Restaurant not found with id: " + restaurantId, exception.getMessage());
+        assertEquals("Restaurant with " + restaurantId + " was not found", exception.getMessage());
     }
 
     @Test
