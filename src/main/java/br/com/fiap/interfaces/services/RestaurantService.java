@@ -3,6 +3,7 @@ package br.com.fiap.interfaces.services;
 import br.com.fiap.dto.PaginatedResponseDTO;
 import br.com.fiap.dto.RestaurantResponseDTO;
 import br.com.fiap.dto.RestaurantDTO;
+import br.com.fiap.model.Restaurant;
 import org.springframework.data.domain.Pageable;
 
 public interface RestaurantService {
@@ -16,4 +17,7 @@ public interface RestaurantService {
 	void delete(Long id);
 
 	PaginatedResponseDTO<RestaurantResponseDTO> getAllRestaurants(Pageable pageable);
+
+	Restaurant getRestaurant(Long id);
+
 }

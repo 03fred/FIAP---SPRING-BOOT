@@ -1,8 +1,8 @@
 package br.com.fiap.services;
 
 import br.com.fiap.dto.PaginatedResponseDTO;
-import br.com.fiap.dto.RestaurantResponseDTO;
 import br.com.fiap.dto.RestaurantDTO;
+import br.com.fiap.dto.RestaurantResponseDTO;
 import br.com.fiap.exceptions.ResourceNotFoundException;
 import br.com.fiap.interfaces.repositories.RestaurantRepository;
 import br.com.fiap.interfaces.services.RestaurantService;
@@ -12,7 +12,6 @@ import br.com.fiap.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,9 +25,6 @@ public class RestaurantServiceImpl implements RestaurantService {
 
 	@Autowired
 	private UserService userService;
-
-	@Autowired
-	private PasswordEncoder passwordEncoder;
 
 
 	@Override
@@ -92,5 +88,13 @@ public class RestaurantServiceImpl implements RestaurantService {
 				restaurantPage.getNumber(),
 				restaurantPage.getSize()
 		);
+	}
+
+	@Override
+	public Restaurant getRestaurant(Long id) {
+		var restaurant = restaurantRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Restaurante não encontrado com o id: " + id));
+
+		return restaurant;
 	}
 }

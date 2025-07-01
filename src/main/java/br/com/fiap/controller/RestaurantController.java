@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/restaurant", produces = {"application/json"})
-@Tag(name = "Restaurant")
+@Tag(name = "Restaurante")
 public class RestaurantController implements RestaurantApi{
 
 	@Autowired
