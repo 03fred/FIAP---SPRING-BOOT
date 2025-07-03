@@ -3,6 +3,7 @@ package br.com.fiap.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 public record UserDTO(
 
@@ -11,6 +12,11 @@ public record UserDTO(
 		String email,
 
 		@NotBlank(message = "A senha é obrigatória")
+		@Size(min = 6, message = "A nova senha deve ter no mínimo 6 caracteres.")
+		@Pattern(
+				regexp = "^(?=.*[A-Za-z])(?=.*\\d).+$",
+				message = "A nova senha deve conter letras e números."
+		)
 		String password,
 
 		@NotBlank(message = "O nome é obrigatório")

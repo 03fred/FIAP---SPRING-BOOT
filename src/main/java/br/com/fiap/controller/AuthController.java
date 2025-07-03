@@ -27,7 +27,7 @@ public class AuthController implements AuthApi {
 	private AuthService authService;
 
 	@Override 
-	@PostMapping
+	@PostMapping("/login")
 	public ResponseEntity<?> authorization(@Valid @RequestBody UserAuthorizationDTO userAuth) {
 		User user = null;
 
