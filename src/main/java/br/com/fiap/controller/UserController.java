@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,6 +32,7 @@ public class UserController implements UserApi {
 	private UserService userService;
 	
 	@Override
+	@PreAuthorize("permitAll()")
 	@PostMapping
 	public ResponseEntity<Map<String, String>> save(@Valid @RequestBody UserDTO userDto) {
 		this.userService.save(userDto);
@@ -38,6 +40,7 @@ public class UserController implements UserApi {
 	}
 	
 	@Override 
+	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/{id}")
 	public ResponseEntity<Map<String, String>> update(@PathVariable("id") Long id, @Valid @RequestBody UserDTO userDto) {
 		userService.update(userDto, id);
@@ -45,6 +48,7 @@ public class UserController implements UserApi {
 	}
 
 	@Override 
+	@PreAuthorize("hasRole('USER')")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Map<String, String>> delete(@PathVariable("id") Long id){
 		userService.delete(id);
@@ -52,6 +56,7 @@ public class UserController implements UserApi {
 	}
 
 	@Override 
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping
 	public ResponseEntity<PaginatedResponseDTO<UserResponseDTO>> getAllUsers(Pageable pageable) {
 		PaginatedResponseDTO<UserResponseDTO> userPage = userService.getAllUsers(pageable);
@@ -59,6 +64,7 @@ public class UserController implements UserApi {
 	}
 
 	@Override 
+	@PreAuthorize("hasRole('USER')")
 	@GetMapping("/{id}")
 	public ResponseEntity<UserResponseDTO> findById(@PathVariable Long id) {
 		return ResponseEntity.ok(userService.getUserById(id));

@@ -1,16 +1,31 @@
 package br.com.fiap.model;
 
-import br.com.fiap.dto.UserDTO;
-import br.com.fiap.model.enums.EnumType;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import br.com.fiap.dto.UserDTO;
+import br.com.fiap.model.enums.EnumType;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -23,9 +38,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.Date;
-import java.util.List;
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -34,8 +46,10 @@ import java.util.List;
 @ToString
 @Entity 
 @Table(name = "users") 
-public class User {
-    @Id
+public class User implements UserDetails {
+    private static final long serialVersionUID = 1L;
+
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -63,9 +77,13 @@ public class User {
     @Column(nullable = false)
     private String address;
 
-    @Enumerated(jakarta.persistence.EnumType.STRING)
-    @Column(name = "user_type", nullable = false)
-    private EnumType enumType;
+    @ManyToMany(fetch=  FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @JoinTable(
+        name = "user_types_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> userTypesRoles = new HashSet<>(); 
 
     @JsonBackReference
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -80,7 +98,18 @@ public class User {
     	this.password = passwordCrypto;
     	this.address = userDto.address();
     	this.dtUpdateRow = new Date();
-    	this.enumType = enumType;
-    	
     }
+
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return getUserTypesRoles().stream().map(role -> new SimpleGrantedAuthority("ROLE_"+role.getName()))
+				.collect(Collectors.toList());
+	}
+
+
+	@Override
+	public String getUsername() {
+		return getLogin();
+	}
 }

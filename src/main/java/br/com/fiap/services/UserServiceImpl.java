@@ -1,38 +1,49 @@
 package br.com.fiap.services;
 
 import java.util.List;
-
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import br.com.fiap.dto.PaginatedResponseDTO;
 import br.com.fiap.dto.UserDTO;
 import br.com.fiap.dto.UserResponseDTO;
 import br.com.fiap.exceptions.ConflictException;
 import br.com.fiap.exceptions.ResourceNotFoundException;
+import br.com.fiap.interfaces.repositories.RoleRepository;
 import br.com.fiap.interfaces.repositories.UserRepository;
 import br.com.fiap.interfaces.services.UserService;
+import br.com.fiap.model.Role;
 import br.com.fiap.model.User;
 import br.com.fiap.model.enums.EnumType;
-import org.springframework.util.Assert;
+import jakarta.transaction.Transactional;
 
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
 
 	@Autowired
 	private UserRepository userRepository;
-
+	
+	
+	@Autowired
+	private RoleRepository roleRepository;
+	
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
 	@Override
+	@Transactional
 	public void save(UserDTO userDto) {
 
 		if (userRepository.existsByEmail(userDto.email())) {
@@ -45,7 +56,12 @@ public class UserServiceImpl implements UserService {
 
 		String passwordCrypto = this.passwordEncoder.encode(userDto.password());
 		User user = new User(userDto, EnumType.USER, passwordCrypto);
+		
+		Role role = this.roleRepository.findByName("USER").orElseGet(()-> roleRepository.save(new Role("USER")));
+		user.setUserTypesRoles(Set.of(role));
+		
 		var save = this.userRepository.save(user);
+		
 //		Assert.notNull(save, "Erro ao salvar o usuário com o email: " + user.getEmail() + ".");
 	}
 
@@ -106,6 +122,12 @@ public class UserServiceImpl implements UserService {
 	public Optional<User> getUser(Long id) {
 		return Optional.ofNullable(userRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o id: " + id)));
+	}
+
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		return userRepository.findByLogin(username)
+				.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o login: " + username));
 	}
 
 }
