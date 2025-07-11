@@ -25,7 +25,7 @@ import br.com.fiap.interfaces.repositories.UserRepository;
 import br.com.fiap.interfaces.services.UserService;
 import br.com.fiap.model.Role;
 import br.com.fiap.model.User;
-import br.com.fiap.model.enums.EnumType;
+import br.com.fiap.model.enums.EnumUserType;
 import jakarta.transaction.Transactional;
 
 
@@ -55,9 +55,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		}
 
 		String passwordCrypto = this.passwordEncoder.encode(userDto.password());
-		User user = new User(userDto, EnumType.USER, passwordCrypto);
+		User user = new User(userDto, EnumUserType.USER, passwordCrypto);
 		
-		Role role = this.roleRepository.findByName("USER").orElseGet(()-> roleRepository.save(new Role("USER")));
+		Role role = this.roleRepository.findByName(EnumUserType.USER.toString())
+				.orElseGet(() -> roleRepository.save(new Role(EnumUserType.USER.toString())));
 		user.setUserTypesRoles(Set.of(role));
 		
 		var save = this.userRepository.save(user);

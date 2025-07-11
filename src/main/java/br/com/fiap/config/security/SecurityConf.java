@@ -25,37 +25,36 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConf {
 
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http, JwtFilter jwtFilter,
-			AuthorizationManager<RequestAuthorizationContext> userAuthorizationManager) throws Exception {
-		  return http
-	                .csrf(AbstractHttpConfigurer::disable)
-	                .authorizeHttpRequests(
-	                        req -> req.requestMatchers(
-									"/h2-console/**",
-											"/auth/**",
-											"/v3/api-docs/**",
-											"/swagger-ui/**",
-											"/swagger-ui.html",
-											"/swagger-resources/**",
-											"/users_type/**",
-											"/webjars/**")
-	                                .permitAll()
-	                                .requestMatchers("/admin/**").hasRole("ADMIN")
-                                    .requestMatchers(HttpMethod.POST, "users").permitAll()
-	                                .anyRequest().authenticated())
-	                .sessionManagement(
-	                        sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-	                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-	                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin())) // Add this line
-	                .build();
+	public SecurityFilterChain filterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception { 
+	    return http
+	            .csrf(AbstractHttpConfigurer::disable)
+	            .authorizeHttpRequests(
+	                    req -> req.requestMatchers(
+	                                    "/h2-console/**",
+	                                    "/auth/**",
+	                                    "/v3/api-docs/**",
+	                                    "/swagger-ui/**",
+	                                    "/swagger-ui.html",
+	                                    "/swagger-resources/**",
+	                                    "/users_type/**",
+	                                    "/webjars/**")
+	                            .permitAll()
+	                            .requestMatchers("/admin/**").hasRole("ADMIN")
+	                            .requestMatchers(HttpMethod.POST, "users").permitAll()
+	                            .anyRequest().authenticated())
+	            .sessionManagement(
+	                    sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+	            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+	            .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
+	            .build();
 	}
 	
 	@Bean
 	public RoleHierarchy roleHierarchy() {
-		RoleHierarchyImpl roleHierarchyImpl = new RoleHierarchyImpl();
-		String hierarchy = "ROLE_ADMIN > ROLE_USER";
-		roleHierarchyImpl.setHierarchy(hierarchy);
-		return roleHierarchy();
+	    RoleHierarchyImpl roleHierarchyImpl = new RoleHierarchyImpl();
+	    String hierarchy = "ROLE_ADMIN > ROLE_USER";
+	    roleHierarchyImpl.setHierarchy(hierarchy);
+	    return roleHierarchyImpl;
 	}
 
 	@Bean

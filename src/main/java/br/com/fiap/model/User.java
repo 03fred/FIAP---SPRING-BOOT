@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import br.com.fiap.dto.UserDTO;
-import br.com.fiap.model.enums.EnumType;
+import br.com.fiap.model.enums.EnumUserType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -91,7 +91,7 @@ public class User implements UserDetails {
     private List<Restaurant> restaurant;
     
     
-    public User(UserDTO userDto, EnumType enumType, String passwordCrypto) {
+    public User(UserDTO userDto, EnumUserType enumType, String passwordCrypto) {
     	this.email = userDto.email();
     	this.name = userDto.name();
     	this.login = userDto.login();
