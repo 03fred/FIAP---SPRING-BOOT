@@ -1,26 +1,27 @@
 package br.com.fiap.services;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import br.com.fiap.dto.*;
+import br.com.fiap.dto.PaginatedResponseDTO;
+import br.com.fiap.dto.PasswordUpdateDTO;
+import br.com.fiap.dto.UserDTO;
+import br.com.fiap.dto.UserPartialUpdateDTO;
+import br.com.fiap.dto.UserResponseDTO;
+import br.com.fiap.dto.UserUpdateDTO;
+import br.com.fiap.exceptions.ConflictException;
+import br.com.fiap.exceptions.ResourceNotFoundException;
+import br.com.fiap.interfaces.repositories.UserRepository;
+import br.com.fiap.interfaces.services.UserService;
+import br.com.fiap.model.User;
+import br.com.fiap.model.enums.EnumType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import br.com.fiap.exceptions.ConflictException;
-import br.com.fiap.exceptions.ResourceNotFoundException;
-
-import br.com.fiap.interfaces.repositories.UserRepository;
-import br.com.fiap.interfaces.services.UserService;
-
-import br.com.fiap.model.User;
-import br.com.fiap.model.enums.EnumType;
-
 import org.springframework.util.Assert;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service

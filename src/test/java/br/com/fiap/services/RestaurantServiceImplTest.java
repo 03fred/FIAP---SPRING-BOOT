@@ -4,11 +4,11 @@ import br.com.fiap.dto.PaginatedResponseDTO;
 import br.com.fiap.dto.RestaurantDTO;
 import br.com.fiap.dto.RestaurantResponseDTO;
 import br.com.fiap.exceptions.ResourceNotFoundException;
+import br.com.fiap.factory.RestaurantFactory;
 import br.com.fiap.interfaces.repositories.RestaurantRepository;
 import br.com.fiap.interfaces.services.UserService;
 import br.com.fiap.model.Restaurant;
 import br.com.fiap.model.User;
-import br.com.fiap.utils.TestDataFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,10 +22,17 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 
-import static br.com.fiap.utils.TestDataFactory.createUser;
+import static br.com.fiap.factory.RestaurantFactory.createRestaurant;
+import static br.com.fiap.factory.UserFactory.createUser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class RestaurantServiceImplTest {
@@ -43,7 +50,7 @@ public class RestaurantServiceImplTest {
     public void shouldSaveRestaurantWithOwnerId() {
         //Arrange
         User owner = createUser(1L);
-        RestaurantDTO restaurantDTO = TestDataFactory.createRestaurantDTO();
+        RestaurantDTO restaurantDTO = RestaurantFactory.createRestaurantDTO();
 
          when(userService.getUser(owner.getId())).thenReturn(Optional.of(owner));
 
@@ -57,7 +64,7 @@ public class RestaurantServiceImplTest {
     @Test
     public void shouldThrowExceptionWhenOwnerIsNotFound() {
         User owner = createUser(1L);
-        RestaurantDTO restaurantDTO = TestDataFactory.createRestaurantDTO();
+        RestaurantDTO restaurantDTO = RestaurantFactory.createRestaurantDTO();
 
         when(userService.getUser(owner.getId())).thenReturn(Optional.empty());
 
@@ -72,7 +79,7 @@ public class RestaurantServiceImplTest {
     public void shouldReturnRestaurantWhenFoundById(){
         Long restaurantId = 1L;
 
-        Restaurant restaurant = TestDataFactory.createRestaurant();
+        Restaurant restaurant = createRestaurant();
 
         when(restaurantRepository.findById(restaurantId)).thenReturn(Optional.of(restaurant));
 
@@ -95,7 +102,7 @@ public class RestaurantServiceImplTest {
 
     @Test
     public void shouldUpdateRestaurantByRestaurantId(){
-        Restaurant restaurant = TestDataFactory.createRestaurant();
+        Restaurant restaurant = createRestaurant();
 
         when(restaurantRepository.findById(restaurant.getId())).thenReturn(Optional.of(restaurant));
 
@@ -128,7 +135,7 @@ public class RestaurantServiceImplTest {
     @Test
     public void shouldDeleteRestaurantByRestaurantId(){
         Long restaurantId = 1L;
-        Restaurant restaurant = TestDataFactory.createRestaurant();
+        Restaurant restaurant = createRestaurant();
         when(restaurantRepository.findById(restaurantId)).thenReturn(Optional.of(restaurant));
 
         restaurantServiceImpl.delete(restaurantId);
@@ -148,7 +155,7 @@ public class RestaurantServiceImplTest {
 
     @Test
     public void shouldListAllRestaurants(){
-        Restaurant restaurant = TestDataFactory.createRestaurant();
+        Restaurant restaurant = createRestaurant();
 
         List<Restaurant> restaurants = List.of(restaurant);
         Page<Restaurant> restaurantPage = new PageImpl<>(restaurants);
@@ -160,8 +167,21 @@ public class RestaurantServiceImplTest {
         PaginatedResponseDTO<RestaurantResponseDTO> responseDTO = restaurantServiceImpl.getAllRestaurants(pageable);
 
         assertEquals(restaurantPage.getTotalElements(), responseDTO.getTotalElements());
-        assertEquals("Ana", responseDTO.getContent().getFirst().name());
+        assertEquals("Ana", responseDTO.getContent().get(0).name());
 
         verify(restaurantRepository).findAll(pageable);
+    }
+
+    @Test
+    public void shouldReturnRestaurantById() {
+        Restaurant restaurant = createRestaurant(); // método de factory utilitária
+        when(restaurantRepository.findById(restaurant.getId())).thenReturn(Optional.of(restaurant));
+
+        Restaurant result = restaurantServiceImpl.getRestaurant(restaurant.getId());
+
+        assertNotNull(result);
+        assertEquals(restaurant.getId(), result.getId());
+        assertEquals(restaurant.getName(), result.getName());
+        verify(restaurantRepository, times(1)).findById(restaurant.getId());
     }
 }

@@ -29,6 +29,17 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
+		<sonar.exclusions>
+			**/br/com/fiap/config/**,
+			**/br/com/fiap/FiapApplication.class,
+			**/br/com/fiap/ServletInitializer.class
+		</sonar.exclusions>
+		<sonar.coverage.exclusions>
+			**/br/com/fiap/config/**,
+			**/br/com/fiap/FiapApplication.class,
+			**/br/com/fiap/ServletInitializer.class
+		</sonar.coverage.exclusions>
+		<sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -63,7 +74,8 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<optional>true</optional>
+			<version>1.18.30</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -96,11 +108,15 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.11.0</version> <!-- adicione uma versão recente -->
 				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
 					<annotationProcessorPaths>
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
+							<version>1.18.30</version>
 						</path>
 					</annotationProcessorPaths>
 				</configuration>
@@ -110,10 +126,10 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
+<!--						<exclude>-->
+<!--							<groupId>org.projectlombok</groupId>-->
+<!--							<artifactId>lombok</artifactId>-->
+<!--						</exclude>-->
 					</excludes>
 				</configuration>
 			</plugin>
@@ -121,6 +137,13 @@
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.8.10</version>
+				<configuration>
+					<excludes>
+						<exclude>**/br/com/fiap/config/**</exclude>
+						<exclude>**/br/com/fiap/FiapApplication.java</exclude>
+						<exclude>**/br/com/fiap/ServletInitializer.java</exclude>
+					</excludes>
+				</configuration>
 				<executions>
 					<execution>
 						<goals>
