@@ -42,7 +42,7 @@ public class AuthController implements AuthApi {
 		}
 
 		if (user != null && authService.verifyPassword(userAuth.password(), user.getPassword())) {
-			String token = JwtTokenUtil.createToken();
+			String token = JwtTokenUtil.createToken(user.getLogin());
 			return ResponseEntity.ok(token);
 		}
 

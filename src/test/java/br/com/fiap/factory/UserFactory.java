@@ -3,7 +3,6 @@ package br.com.fiap.factory;
 import br.com.fiap.dto.UserDTO;
 import br.com.fiap.dto.UserUpdateDTO;
 import br.com.fiap.model.User;
-import br.com.fiap.model.enums.EnumType;
 
 public class UserFactory {
 
@@ -21,8 +20,6 @@ public class UserFactory {
         user.setLogin("anaLogin");
         user.setPassword("hashedSenha");  // Importante: senha deve bater com o when
         user.setAddress("rua 1");
-        user.setEnumType(EnumType.USER);
-
         return user;
     }
 

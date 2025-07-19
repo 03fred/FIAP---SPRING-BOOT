@@ -1,10 +1,17 @@
 package br.com.fiap.interfaces.services;
 
-import br.com.fiap.dto.*;
-import br.com.fiap.model.User;
-import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
+
+import org.springframework.data.domain.Pageable;
+
+import br.com.fiap.dto.PaginatedResponseDTO;
+import br.com.fiap.dto.PasswordUpdateDTO;
+import br.com.fiap.dto.UserDTO;
+import br.com.fiap.dto.UserPartialUpdateDTO;
+import br.com.fiap.dto.UserResponseDTO;
+import br.com.fiap.dto.UserUpdateDTO;
+import br.com.fiap.model.User;
 
 
 public interface UserService {
@@ -24,5 +31,7 @@ public interface UserService {
 	UserResponseDTO getUserById(Long id);
 
 	Optional<User> getUser(Long id);
+	
+	void update(UserDTO userDto);
 
 }
