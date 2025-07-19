@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "ac846b7a-8e05-4c6a-b77a-8ab70c3068d2",
+		"_postman_id": "2647e059-8aca-401f-ab18-29fcd6fc88d0",
 		"name": "Pós Tech Java - Challenge",
 		"description": "### 🔐 Autenticação\n\nEsta API utiliza **JWT (JSON Web Token)** para autenticação. O token é obtido via login e incluído automaticamente nas requisições através de variável de coleção.\n\n🌐 **Base URL**  \n`http://localhost:8080`\n\n📌 **Endpoints Disponíveis**\n\n- `POST /users` — Criar novo usuário\n    \n- `POST /auth` — Login do usuário\n    \n- `PUT /users/{id}` — Atualizar usuário _(requer token)_\n    \n- `DELETE /users/{id}` — Deletar usuário _(requer token)_\n    \n- `GET /users` — Listar todos os usuários _(requer token)_\n    \n- `GET /users/{id}` — Buscar usuário por ID _(requer token)_",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "36159861"
+		"_exporter_id": "46899537"
 	},
 	"item": [
 		{
@@ -17,7 +17,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"paulo@gmail.com\",\r\n    \"password\": \"12345678\",\r\n    \"name\": \"Paulo Moura\",\r\n    \"address\": \"Rua São José, casa 1\",\r\n    \"login\": \"Paulo123\"\r\n} ",
+							"raw": "{\r\n    \"email\": \"paulo@gmail.com\",\r\n    \"password\": \"123456A78\",\r\n    \"name\": \"Paulo Moura\",\r\n    \"address\": \"Rua São José, casa 1\",\r\n    \"login\": \"Paulo123\"\r\n} ",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -25,14 +25,15 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8081/users",
+							"raw": "http://localhost:8081/users/create",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "8081",
 							"path": [
-								"users"
+								"users",
+								"create"
 							]
 						},
 						"description": "## 🆕 Criar Usuário\n\n**POST /users**\n\nCria um novo usuário na base de dados.\n\n🔓 **Não requer autenticação**"
@@ -74,6 +75,45 @@
 								"users",
 								"update",
 								"1"
+							]
+						},
+						"description": "## 🔄 Alterar Usuário\n\n**PUT /users/{id}**\n\nAtualiza os dados de um usuário já existente com base no ID informado.\n\n🔐 **Requer token JWT**"
+					},
+					"response": []
+				},
+				{
+					"name": "Alterar Individual",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"lk@gmail.com\",\r\n    \"password\": \"12345678\",\r\n    \"name\": \"Lucca Meurer\",\r\n    \"address\": \"Rua 1, que fica ao lado da rua 2\",\r\n    \"login\": \"LUK\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"users"
 							]
 						},
 						"description": "## 🔄 Alterar Usuário\n\n**PUT /users/{id}**\n\nAtualiza os dados de um usuário já existente com base no ID informado.\n\n🔐 **Requer token JWT**"
@@ -303,14 +343,59 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8081/auth",
+							"raw": "http://localhost:8081/auth/login",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "8081",
 							"path": [
-								"auth"
+								"auth",
+								"login"
+							]
+						},
+						"description": "## 🔐 Login\n\n**POST /auth**\n\nRealiza a autenticação do usuário e retorna um **token JWT**.\n\nEsse token é salvo automaticamente na variável \"`token\"` da coleção, por meio de script, e usado em todas as requisições autenticadas."
+					},
+					"response": []
+				},
+				{
+					"name": "Login Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let jsonData = pm.response.text();\r",
+									"\r",
+									"pm.collectionVariables.set(\"token\", jsonData);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"identificador\": \"admin\",\r\n    \"password\": \"123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"auth",
+								"login"
 							]
 						},
 						"description": "## 🔐 Login\n\n**POST /auth**\n\nRealiza a autenticação do usuário e retorna um **token JWT**.\n\nEsse token é salvo automaticamente na variável \"`token\"` da coleção, por meio de script, e usado em todas as requisições autenticadas."
@@ -327,6 +412,89 @@
 		{
 			"name": "Restaurant",
 			"item": []
+		},
+		{
+			"name": "Users Role",
+			"item": [
+				{
+					"name": "save permission",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"login\": \"Paulo123\",\r\n    \"role\": \"RESTAURANT_OWNER\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/users_type",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"users_type"
+							]
+						},
+						"description": "## 🔄 Alterar Usuário\n\n**PUT /users/{id}**\n\nAtualiza os dados de um usuário já existente com base no ID informado.\n\n🔐 **Requer token JWT**"
+					},
+					"response": []
+				},
+				{
+					"name": "delete permission",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"login\": \"Paulo123\",\r\n    \"role\": \"RESTAURANT_OWNER\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/users_type",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"users_type"
+							]
+						},
+						"description": "## 🔄 Alterar Usuário\n\n**PUT /users/{id}**\n\nAtualiza os dados de um usuário já existente com base no ID informado.\n\n🔐 **Requer token JWT**"
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"event": [

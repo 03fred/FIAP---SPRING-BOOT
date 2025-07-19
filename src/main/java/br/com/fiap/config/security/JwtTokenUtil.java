@@ -1,14 +1,6 @@
 package br.com.fiap.config.security;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -20,10 +12,10 @@ public class JwtTokenUtil {
 
 	private final static String JWT_SECRET = "AA";
 	
-	public static String createToken() {
+	public static String createToken(String login) {
 		
 		return JWT.create()
-				.withSubject("name")
+				.withSubject(login)
 				.withIssuedAt(new Date())
 				.withExpiresAt(new Date(System.currentTimeMillis() + 100 * 60 * 60))
 				.sign(Algorithm.HMAC256(JWT_SECRET));
@@ -41,11 +33,8 @@ public class JwtTokenUtil {
 
 	}
 	
-	public static Authentication getAuthentication(String token) {
+	public static String getAuthentication(String token) {
 		DecodedJWT decodedJWT = JwtTokenUtil.parseToken(token);
-		String userName = decodedJWT.getSubject();
-		List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-		UserDetails userDetails = new User(userName, "", authorities);
-		return new UsernamePasswordAuthenticationToken(userDetails, "", authorities);
+		return  decodedJWT.getSubject();
 	}
 }

@@ -1,6 +1,8 @@
 package br.com.fiap.model.enums;
 
-public enum UserType {
+public enum EnumUserType {
 	RESTAURANT_OWNER,
-    USER
+    USER,
+    ADMIN
+
 }
