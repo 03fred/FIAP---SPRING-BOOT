@@ -1,5 +1,6 @@
 package br.com.fiap.interfaces.swagger;
 
+
 import java.util.Map;
 
 import org.springframework.data.domain.Pageable;
@@ -8,8 +9,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import br.com.fiap.dto.PaginatedResponseDTO;
+import br.com.fiap.dto.PasswordUpdateDTO;
 import br.com.fiap.dto.UserDTO;
+import br.com.fiap.dto.UserPartialUpdateDTO;
 import br.com.fiap.dto.UserResponseDTO;
+import br.com.fiap.dto.UserUpdateDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -35,7 +39,7 @@ public interface UserApi {
 			@ApiResponse(responseCode = "200", description = "Usuário atualizado com sucesso", content = @Content(schema = @Schema(implementation = Map.class))),
 			@ApiResponse(responseCode = "400", description = "Dados de entrada inválidos", content = @Content(schema = @Schema(implementation = Map.class))),
 			@ApiResponse(responseCode = "404", description = "Usuário não encontrado", content = @Content(schema = @Schema(implementation = Map.class))) })
-	ResponseEntity<Map<String, String>> update(@PathVariable("id") Long id, @Valid @RequestBody UserDTO userDto);
+	ResponseEntity<Map<String, String>> update(@PathVariable("id") Long id, @Valid @RequestBody UserUpdateDTO userUpdateDTO);
 
 
 	@Operation(summary = "Atualizar usuário", description = "Atualiza os dados de um usuário existente.")
@@ -67,4 +71,28 @@ public interface UserApi {
 			@ApiResponse(responseCode = "200", description = "Usuário encontrado com sucesso", content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
 			@ApiResponse(responseCode = "404", description = "Usuário não encontrado", content = @Content(schema = @Schema(implementation = Map.class))) })
 	ResponseEntity<UserResponseDTO> findById(@PathVariable Long id);
+
+	@Operation(summary = "Atualização parcial de dados do usuário",
+			description = "Atualiza um ou mais campos específicos de um usuário existente.")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Campo atualizado com sucesso", content = @Content(schema = @Schema(implementation = Map.class))),
+			@ApiResponse(responseCode = "400", description = "Dados inválidos ou campo não permitido", content = @Content(schema = @Schema(implementation = Map.class))),
+			@ApiResponse(responseCode = "404", description = "Usuário não encontrado", content = @Content(schema = @Schema(implementation = Map.class)))
+	})
+	ResponseEntity<Map<String, String>> updatePartial(
+			@PathVariable("id") Long id,
+			@RequestBody UserPartialUpdateDTO dto);
+
+	@Operation(summary = "Atualizar senha do usuário",
+			description = "Altera a senha do usuário mediante validação da senha atual e confirmação da nova senha.")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Senha atualizada com sucesso", content = @Content(schema = @Schema(implementation = Map.class))),
+			@ApiResponse(responseCode = "400", description = "Senha atual incorreta ou confirmação inválida", content = @Content(schema = @Schema(implementation = Map.class))),
+			@ApiResponse(responseCode = "404", description = "Usuário não encontrado", content = @Content(schema = @Schema(implementation = Map.class)))
+	})
+	ResponseEntity<Map<String, String>> updatePassword(
+			@PathVariable("id") Long id,
+			@Valid @RequestBody PasswordUpdateDTO dto);
 }
+
+

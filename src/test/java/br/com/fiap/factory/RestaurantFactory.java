@@ -1,18 +1,13 @@
-package br.com.fiap.utils;
+package br.com.fiap.factory;
 
 import br.com.fiap.dto.RestaurantDTO;
 import br.com.fiap.model.Restaurant;
-import br.com.fiap.model.User;
 
 import java.util.ArrayList;
 
-public class TestDataFactory {
+import static br.com.fiap.factory.UserFactory.createUser;
 
-    public static User createUser(Long id) {
-        User user = new User();
-        user.setId(id);
-        return user;
-    }
+public class RestaurantFactory {
 
     public static RestaurantDTO createRestaurantDTO() {
         return new RestaurantDTO(
