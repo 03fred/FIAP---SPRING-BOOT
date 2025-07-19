@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -55,7 +57,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		}
 
 		String passwordCrypto = this.passwordEncoder.encode(userDto.password());
-		User user = new User(userDto, EnumUserType.USER, passwordCrypto);
+		User user = new User(userDto, passwordCrypto);
 		
 		Role role = this.roleRepository.findByName(EnumUserType.USER.toString())
 				.orElseGet(() -> roleRepository.save(new Role(EnumUserType.USER.toString())));
@@ -63,25 +65,18 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		
 		var save = this.userRepository.save(user);
 		
-//		Assert.notNull(save, "Erro ao salvar o usuário com o email: " + user.getEmail() + ".");
+		Assert.notNull(save, "Erro ao salvar o usuário com o email: " + user.getEmail() + ".");
 	}
 
 	@Override
 	public void update(UserDTO userDto, Long id) {
 		User user = userRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o id: " + id));
-		
-		String passwordCrypto = this.passwordEncoder.encode(userDto.password());
-		
-		user.setEmail(userDto.email());
-		user.setPassword(passwordCrypto);
-		user.setName(userDto.name());
-		user.setAddress(userDto.address());
-		user.setLogin(userDto.login());
-		
-		var save = this.userRepository.save(user);
+
+		User userUpadte = getUser(userDto, user);
+		var save = this.userRepository.save(userUpadte);
 		Assert.notNull(save, "Erro ao atualizaro o usuário com o email: " + user.getEmail() + ".");
-		
+
 	}
 
 	@Override
@@ -129,6 +124,28 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		return userRepository.findByLogin(username)
 				.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o login: " + username));
+	}
+
+	@Override
+	public void update(UserDTO userDto) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		User userAuth = (User) authentication.getPrincipal();
+		User user = userRepository.findByLogin(userAuth.getLogin())
+				.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o login: " + userAuth.getLogin()));
+		
+       User userUpadte = getUser(userDto, user);
+       var save = this.userRepository.save(userUpadte);
+		Assert.notNull(save, "Erro ao atualizaro o usuário com o email: " + user.getEmail() + ".");
+	}
+	
+	private User getUser(UserDTO userDto, User user) {
+		String passwordCrypto = this.passwordEncoder.encode(userDto.password());
+		user.setEmail(userDto.email());
+		user.setPassword(passwordCrypto);
+		user.setName(userDto.name());
+		user.setAddress(userDto.address());
+		user.setLogin(userDto.login());
+		return user;
 	}
 
 }

@@ -4,7 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 
 public record UserTypeDTO(
 
-		@NotBlank(message = "O nome é obrigatório")
-		String name
-		
+		@NotBlank(message = "O login é obrigatório") String login,
+
+		@NotBlank(message = "O permissão é obrigatória") String role
+
 ) {}

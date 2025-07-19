@@ -49,6 +49,14 @@ public class UserController implements UserApi {
 
 	@Override 
 	@PreAuthorize("hasRole('USER')")
+	@PutMapping
+	public ResponseEntity<Map<String, String>> update(@Valid @RequestBody UserDTO userDto) {
+		userService.update(userDto);
+		return ResponseEntity.ok(Map.of("mensagem", "Usuário atualizado com sucesso."));
+	}
+	
+	@Override 
+	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Map<String, String>> delete(@PathVariable("id") Long id){
 		userService.delete(id);
@@ -64,7 +72,7 @@ public class UserController implements UserApi {
 	}
 
 	@Override 
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/{id}")
 	public ResponseEntity<UserResponseDTO> findById(@PathVariable Long id) {
 		return ResponseEntity.ok(userService.getUserById(id));

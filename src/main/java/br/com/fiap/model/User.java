@@ -15,7 +15,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import br.com.fiap.dto.UserDTO;
-import br.com.fiap.model.enums.EnumUserType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -77,7 +76,7 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String address;
 
-    @ManyToMany(fetch=  FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(
         name = "user_types_roles",
         joinColumns = @JoinColumn(name = "user_id"),
@@ -91,11 +90,19 @@ public class User implements UserDetails {
     private List<Restaurant> restaurant;
     
     
-    public User(UserDTO userDto, EnumUserType enumType, String passwordCrypto) {
+    public User(UserDTO userDto, String passwordCrypto) {
     	this.email = userDto.email();
     	this.name = userDto.name();
     	this.login = userDto.login();
     	this.password = passwordCrypto;
+    	this.address = userDto.address();
+    	this.dtUpdateRow = new Date();
+    }
+
+    public User(UserDTO userDto) {
+    	this.email = userDto.email();
+    	this.name = userDto.name();
+    	this.login = userDto.login();
     	this.address = userDto.address();
     	this.dtUpdateRow = new Date();
     }
@@ -112,4 +119,8 @@ public class User implements UserDetails {
 	public String getUsername() {
 		return getLogin();
 	}
+	
+    public void removeRole(Role role) {
+        this.userTypesRoles.remove(role);
+    }
 }

@@ -1,5 +1,12 @@
 package br.com.fiap.interfaces.swagger;
 
+import java.util.Map;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+
 import br.com.fiap.dto.PaginatedResponseDTO;
 import br.com.fiap.dto.UserDTO;
 import br.com.fiap.dto.UserResponseDTO;
@@ -12,13 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import jakarta.validation.Valid;
-
-import java.util.Map;
 
 @Tag(name = "Usuários")
 public interface UserApi {
@@ -29,13 +30,22 @@ public interface UserApi {
 			@ApiResponse(responseCode = "400", description = "Dados de entrada inválidos.", content = @Content(schema = @Schema(implementation = Map.class))) })
 	ResponseEntity<Map<String, String>> save(@Valid @RequestBody UserDTO userDto);
 
-	@Operation(summary = "Atualizar usuário", description = "Atualiza os dados de um usuário existente com base no ID fornecido.")
+	@Operation(summary = "Atualizar usuários", description = "Atualiza os dados de um usuário existente com base no ID fornecido.")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Usuário atualizado com sucesso", content = @Content(schema = @Schema(implementation = Map.class))),
 			@ApiResponse(responseCode = "400", description = "Dados de entrada inválidos", content = @Content(schema = @Schema(implementation = Map.class))),
 			@ApiResponse(responseCode = "404", description = "Usuário não encontrado", content = @Content(schema = @Schema(implementation = Map.class))) })
 	ResponseEntity<Map<String, String>> update(@PathVariable("id") Long id, @Valid @RequestBody UserDTO userDto);
 
+
+	@Operation(summary = "Atualizar usuário", description = "Atualiza os dados de um usuário existente.")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Usuário atualizado com sucesso", content = @Content(schema = @Schema(implementation = Map.class))),
+			@ApiResponse(responseCode = "400", description = "Dados de entrada inválidos", content = @Content(schema = @Schema(implementation = Map.class))),
+			@ApiResponse(responseCode = "404", description = "Usuário não encontrado", content = @Content(schema = @Schema(implementation = Map.class))) })
+	ResponseEntity<Map<String, String>> update(@Valid @RequestBody UserDTO userDto);
+
+	
 	@Operation(summary = "Excluir usuário", description = "Exclui um usuário existente com base no ID fornecido.")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "204", description = "Usuário excluído com sucesso", content = @Content(schema = @Schema(implementation = Map.class))), // Even
