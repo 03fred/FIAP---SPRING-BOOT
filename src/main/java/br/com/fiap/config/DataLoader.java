@@ -1,5 +1,6 @@
 package br.com.fiap.config;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.boot.CommandLineRunner;
@@ -27,10 +28,9 @@ public class DataLoader implements CommandLineRunner {
 	}
 
     @Override
-    @Transactional // Garante que esta operação esteja dentro de uma transação
+    @Transactional 
     public void run(String... args) throws Exception {
-    
-			// Check if an admin user already exists to prevent duplicates on restart
+    	
 			if (userRepository.findByLogin("admin").isEmpty()) {
 				User adminUser = new User();
 				adminUser.setName("admin");
@@ -39,9 +39,21 @@ public class DataLoader implements CommandLineRunner {
 				adminUser.setAddress("Rua - admin 123");
 				adminUser.setPassword(passwordEncoder.encode("123"));
 
-				Role role = roleRepository.findByName(EnumUserType.ADMIN.toString())
+				Role roleAdmin = roleRepository.findByName(EnumUserType.ADMIN.toString())
 						.orElseGet(() -> roleRepository.save(new Role(EnumUserType.ADMIN.toString())));
-				adminUser.setUserTypesRoles(Set.of(role));
+				
+				Role roleUser = roleRepository.findByName(EnumUserType.USER.toString())
+						.orElseGet(() -> roleRepository.save(new Role(EnumUserType.USER.toString())));
+				
+				Role roleRestauranteOwner = roleRepository.findByName(EnumUserType.RESTAURANT_OWNER.toString())
+						.orElseGet(() -> roleRepository.save(new Role(EnumUserType.RESTAURANT_OWNER.toString())));
+			
+				Set<Role> userTypesRoles = new HashSet<>();
+				userTypesRoles.add(roleAdmin);
+				userTypesRoles.add(roleUser);
+				userTypesRoles.add(roleRestauranteOwner);
+						
+				adminUser.setUserTypesRoles(userTypesRoles);
 
 				var save = userRepository.save(adminUser);
 

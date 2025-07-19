@@ -36,7 +36,6 @@ public class UserController implements UserApi {
 	private UserService userService;
 	
 	@Override
-	@PreAuthorize("permitAll()")
 	@PostMapping("/create")
 	public ResponseEntity<Map<String, String>> save(@Valid @RequestBody UserDTO userDto) {
 		this.userService.save(userDto);

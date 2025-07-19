@@ -30,6 +30,7 @@ public class RestaurantController implements RestaurantApi{
 	private RestaurantService restaurantService;
 	
 	@Override
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping
 	public ResponseEntity<Void> save(@Valid @RequestBody RestaurantDTO restaurantDTO, @RequestParam Long ownerId) {
 		System.out.println("Chamou o save! ownerId=" + ownerId);

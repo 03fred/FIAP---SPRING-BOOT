@@ -38,7 +38,7 @@ public class SecurityConf {
 	                                    "/webjars/**")
 	                            .permitAll()
 	                            .requestMatchers("/admin/**").hasRole("ADMIN")
-	                            .requestMatchers(HttpMethod.POST, "users").permitAll()
+	                            .requestMatchers(HttpMethod.POST, "users/create").permitAll()
 	                            .anyRequest().authenticated())
 	            .sessionManagement(
 	                    sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
