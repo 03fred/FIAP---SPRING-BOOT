@@ -35,8 +35,6 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class UserServiceImpl implements UserService, UserDetailsService {
-
-	@Autowired
 	private UserRepository userRepository;
 
 	@Autowired
@@ -65,8 +63,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		user.setUserTypesRoles(Set.of(role));
 
 		var save = this.userRepository.save(user);
-
-		Assert.notNull(save, "Erro ao salvar o usuário com o email: " + user.getEmail() + ".");
 	}
 
 	@Override

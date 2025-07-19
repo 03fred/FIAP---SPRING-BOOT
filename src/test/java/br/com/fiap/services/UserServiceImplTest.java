@@ -1,15 +1,18 @@
 package br.com.fiap.services;
 
-import br.com.fiap.dto.PaginatedResponseDTO;
-import br.com.fiap.dto.PasswordUpdateDTO;
-import br.com.fiap.dto.UserDTO;
-import br.com.fiap.dto.UserPartialUpdateDTO;
-import br.com.fiap.dto.UserResponseDTO;
-import br.com.fiap.dto.UserUpdateDTO;
-import br.com.fiap.exceptions.ConflictException;
-import br.com.fiap.exceptions.ResourceNotFoundException;
-import br.com.fiap.interfaces.repositories.UserRepository;
-import br.com.fiap.model.User;
+import static br.com.fiap.factory.UserFactory.UserUpdateDTOMock;
+import static br.com.fiap.factory.UserFactory.createUserDTOMock;
+import static br.com.fiap.factory.UserFactory.createUserMock;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,24 +24,28 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.List;
-import java.util.Optional;
-
-import static br.com.fiap.factory.UserFactory.UserUpdateDTOMock;
-import static br.com.fiap.factory.UserFactory.createUserDTOMock;
-import static br.com.fiap.factory.UserFactory.createUserMock;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import br.com.fiap.dto.PaginatedResponseDTO;
+import br.com.fiap.dto.PasswordUpdateDTO;
+import br.com.fiap.dto.UserDTO;
+import br.com.fiap.dto.UserPartialUpdateDTO;
+import br.com.fiap.dto.UserResponseDTO;
+import br.com.fiap.dto.UserUpdateDTO;
+import br.com.fiap.exceptions.ConflictException;
+import br.com.fiap.exceptions.ResourceNotFoundException;
+import br.com.fiap.interfaces.repositories.RoleRepository;
+import br.com.fiap.interfaces.repositories.UserRepository;
+import br.com.fiap.model.Role;
+import br.com.fiap.model.User;
+import br.com.fiap.model.enums.EnumUserType;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
+    
+    @Mock
+    private RoleRepository roleRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -49,10 +56,12 @@ class UserServiceImplTest {
     @Test
     void shouldSaveUserSuccessfully() {
         UserDTO userDTO = createUserDTOMock();
+        Role userRole = new Role(EnumUserType.USER.toString());
         when(userRepository.existsByEmail(userDTO.email())).thenReturn(false);
         when(userRepository.existsByLogin(userDTO.login())).thenReturn(false);
-        when(passwordEncoder.encode(userDTO.password())).thenReturn("senha-criptografada");
-
+        when(passwordEncoder.encode(userDTO.password())).thenReturn("senha-criptografada123");
+        when(roleRepository.findByName(EnumUserType.USER.toString())).thenReturn(Optional.of(userRole));
+        
         userService.save(userDTO);
 
         verify(userRepository).save(any(User.class));
