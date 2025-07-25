@@ -29,12 +29,22 @@ public class MenuController implements MenuApi {
 	private MenuService menuService;
 	
 	@Override
-	@PreAuthorize("hasRole('RESTAURANT_OWNER')")
-	@PostMapping
-	public ResponseEntity<Void> save(@Valid @RequestBody MenuDTO menuDTO, Long codigoRestaurante) {
-		this.menuService.save(menuDTO, codigoRestaurante);
+	@PreAuthorize("hasRole('ADMIN')")
+	@PostMapping("/restaurant/{restaurantId}")
+	public ResponseEntity<Void> save(@Valid @RequestBody MenuDTO menuDTO,@PathVariable("restaurantId") Long restaurantId) {
+		this.menuService.save(menuDTO, restaurantId);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
+	
+
+	//TODO SWAGGER @Override
+	@PreAuthorize("hasRole('RESTAURANT_OWNER')")
+	@PostMapping
+	public ResponseEntity<Void> save(@Valid @RequestBody MenuDTO menuDTO) {
+		this.menuService.save(menuDTO);
+		return ResponseEntity.status(HttpStatus.CREATED).build();
+	}
+	
 	
 	@Override
 	@PreAuthorize("hasRole('RESTAURANT_OWNER')")
@@ -52,17 +62,25 @@ public class MenuController implements MenuApi {
 		return ResponseEntity.noContent().build();
 	}
 
-	@Override
+	//TODO SWAGGER @Override
 	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping("/restaurant/{id}")
+	public ResponseEntity<PaginatedResponseDTO<MenuResponseDTO>> getAllMenus(@PathVariable("id") Long id, Pageable pageable) {
+		PaginatedResponseDTO<MenuResponseDTO> restaurantPage = menuService.getAllMenu(pageable, id);
+		return ResponseEntity.ok(restaurantPage);
+	}
+
+	@Override
+	@PreAuthorize("hasRole('RESTAURANT_OWNER')")
 	@GetMapping
 	public ResponseEntity<PaginatedResponseDTO<MenuResponseDTO>> getAllMenus(Pageable pageable) {
 		PaginatedResponseDTO<MenuResponseDTO> restaurantPage = menuService.getAllMenu(pageable);
 		return ResponseEntity.ok(restaurantPage);
 	}
-
+	
 	@Override
 	@GetMapping("/{id}")
-	public ResponseEntity<MenuResponseDTO> findById(Long id) {
+	public ResponseEntity<MenuResponseDTO> findById(@PathVariable("id") Long id) {
 		return ResponseEntity.ok(menuService.getMenuById(id));
 	}
 

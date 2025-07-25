@@ -12,10 +12,11 @@ public class JwtTokenUtil {
 
 	private final static String JWT_SECRET = "AA";
 	
-	public static String createToken(String login) {
+	public static String createToken(String login, Long restaurantId) {
 		
 		return JWT.create()
 				.withSubject(login)
+				.withClaim("restaurantId", restaurantId)
 				.withIssuedAt(new Date())
 				.withExpiresAt(new Date(System.currentTimeMillis() + 100 * 60 * 60))
 				.sign(Algorithm.HMAC256(JWT_SECRET));
@@ -33,8 +34,13 @@ public class JwtTokenUtil {
 
 	}
 	
-	public static String getAuthentication(String token) {
+	public static String getLogin(String token) {
 		DecodedJWT decodedJWT = JwtTokenUtil.parseToken(token);
 		return  decodedJWT.getSubject();
+	}
+	
+	public static Long getRestaurantId(String token) {
+		DecodedJWT decodedJWT = JwtTokenUtil.parseToken(token);
+		return decodedJWT.getClaim("restaurantId").asLong();
 	}
 }

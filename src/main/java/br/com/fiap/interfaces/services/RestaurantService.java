@@ -1,14 +1,17 @@
 package br.com.fiap.interfaces.services;
 
-import br.com.fiap.dto.PaginatedResponseDTO;
-import br.com.fiap.dto.RestaurantResponseDTO;
-import br.com.fiap.dto.RestaurantDTO;
-import br.com.fiap.model.Restaurant;
 import org.springframework.data.domain.Pageable;
+
+import br.com.fiap.dto.PaginatedResponseDTO;
+import br.com.fiap.dto.RestaurantDTO;
+import br.com.fiap.dto.RestaurantResponseDTO;
+import br.com.fiap.model.Restaurant;
 
 public interface RestaurantService {
 	
 	void save(RestaurantDTO restaurantDTO, Long ownerId);
+	
+	void save(RestaurantDTO restaurantDTO);
 	
 	RestaurantResponseDTO getRestaurantById(Long id);
 
@@ -20,4 +23,9 @@ public interface RestaurantService {
 
 	Restaurant getRestaurant(Long id);
 
+	void delete();
+	
+	public PaginatedResponseDTO<RestaurantResponseDTO> getRestaurants(Pageable pageable);
+
+    Restaurant findByIdAndRestaurantOwnerId(Long restaurantId, Long userId);
 }

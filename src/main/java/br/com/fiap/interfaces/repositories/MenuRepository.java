@@ -1,11 +1,16 @@
 package br.com.fiap.interfaces.repositories;
 
-import br.com.fiap.model.Menu;
+import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Optional;
+import br.com.fiap.model.Menu;
 
 public interface MenuRepository extends JpaRepository<Menu, Long>{
 
     Optional<Menu> findById(Long id);
+    
+    Page<Menu> findAllByRestaurant(Long restaurantId, Pageable pageable);
 }

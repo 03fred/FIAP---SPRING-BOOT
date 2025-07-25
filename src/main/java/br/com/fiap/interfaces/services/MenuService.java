@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 public interface MenuService {
 	
 	void save(MenuDTO menuDTO, Long codigoRestaurante);
+	
+	void save(MenuDTO menuDTO);
 
 	MenuResponseDTO getMenuById(Long id);
 
@@ -16,4 +18,7 @@ public interface MenuService {
 	void delete(Long id);
 
 	PaginatedResponseDTO<MenuResponseDTO> getAllMenu(Pageable pageable);
+	
+	PaginatedResponseDTO<MenuResponseDTO> getAllMenu(Pageable pageable, Long restaurantId);
+	
 }
