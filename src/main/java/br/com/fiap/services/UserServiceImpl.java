@@ -9,9 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -27,13 +24,14 @@ import br.com.fiap.exceptions.ResourceNotFoundException;
 import br.com.fiap.interfaces.repositories.RoleRepository;
 import br.com.fiap.interfaces.repositories.UserRepository;
 import br.com.fiap.interfaces.services.UserService;
+import br.com.fiap.model.AuthenticatedUser;
 import br.com.fiap.model.Role;
 import br.com.fiap.model.User;
 import br.com.fiap.model.enums.EnumUserType;
 import jakarta.transaction.Transactional;
 
 @Service
-public class UserServiceImpl implements UserService, UserDetailsService {
+public class UserServiceImpl implements UserService {
 	private final UserRepository userRepository;
 	private final RoleRepository roleRepository;
 	private final PasswordEncoder passwordEncoder;
@@ -114,15 +112,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	}
 
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		return userRepository.findByLogin(username)
-				.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o login: " + username));
-	}
-
-	@Override
 	public void update(UserDTO userDto) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		User userAuth = (User) authentication.getPrincipal();
+		AuthenticatedUser userAuth = (AuthenticatedUser) authentication.getPrincipal();
 		User user = userRepository.findByLogin(userAuth.getLogin()).orElseThrow(
 				() -> new ResourceNotFoundException("Usuário não encontrado com o login: " + userAuth.getLogin()));
 

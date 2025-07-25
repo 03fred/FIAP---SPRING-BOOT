@@ -1,15 +1,9 @@
 package br.com.fiap.model;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -45,7 +39,7 @@ import lombok.ToString;
 @ToString
 @Entity 
 @Table(name = "users") 
-public class User implements UserDetails {
+public class User {
     private static final long serialVersionUID = 1L;
 
 	@Id
@@ -107,19 +101,6 @@ public class User implements UserDetails {
     	this.dtUpdateRow = new Date();
     }
 
-
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return getUserTypesRoles().stream().map(role -> new SimpleGrantedAuthority("ROLE_"+role.getName()))
-				.collect(Collectors.toList());
-	}
-
-
-	@Override
-	public String getUsername() {
-		return getLogin();
-	}
-	
     public void removeRole(Role role) {
         this.userTypesRoles.remove(role);
     }
