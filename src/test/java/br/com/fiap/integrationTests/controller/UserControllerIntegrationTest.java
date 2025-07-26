@@ -10,17 +10,24 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.hamcrest.Matchers.hasItem;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@TestPropertySource(properties = "spring.profiles.active=test")
+@TestPropertySource(properties = {
+        "spring.jpa.hibernate.ddl-auto=create-drop" // Ensures H2 schema is created for tests
+})
 @Transactional
 public class UserControllerIntegrationTest {
 
@@ -50,9 +57,29 @@ public class UserControllerIntegrationTest {
 
 
     @Test
-    public void givenValidUserDTO_whenCreateUser_thenReturnsCreatedStatus() throws Exception {
+    public void givenValidUserDTO_whenCreateUser_thenReturnsSuccessMessage() throws Exception {
         UserDTO userDto = new UserDTO(
                 "ana@email.com",
+                "password123",
+                "Ana",
+                "123 Main St",
+                "ana_login");
+
+        mockMvc.perform(
+                post("/users/create")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(userDto))
+            ).andExpect(status().isCreated())
+             .andExpect(jsonPath("$.mensagem").value("Usuário cadastrado com sucesso!"));
+
+        User savedUser = userRepository.findByEmail("ana@email.com").orElseThrow();
+        assertEquals("Ana", savedUser.getName());
+    }
+
+    @Test
+    public void givenInvalidEmail_whenCreateUser_thenReturnsBadRequestStatus() throws Exception {
+        UserDTO userDto = new UserDTO(
+                "invalid-email",
                 "password123",
                 "Ana",
                 "123 Main St",
@@ -65,30 +92,16 @@ public class UserControllerIntegrationTest {
                         .contentType("application/json")
                         .content(jsonRequest)
         )
-        .andExpect(status().isCreated());
-    }
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.errors", hasItem("email : E-mail inválido")));
 
-    @Test
-    public void givenInvalidUserDTO_whenCreateUser_thenReturnsBadRequestStatus() throws Exception {
-        UserDTO userDto = new UserDTO(
-                "invalid-email",
-                "short",
-                "",
-                "123 Main St",
-                "ana_login");
-
-        String jsonRequest = objectMapper.writeValueAsString(userDto);
-
-        mockMvc.perform(
-                post("/users/create")
-                        .contentType("application/json")
-                        .content(jsonRequest)
-        )
-        .andExpect(status().isBadRequest());
+        assertFalse(userRepository.findByEmail("invalid-email").isPresent());
     }
 
     @Test
     public void givenEmptyUserDTO_whenCreateUser_thenReturnsBadRequestStatus() throws Exception {
+        userRepository.deleteAll();
+
         UserDTO userDto = new UserDTO("", "", "", "", "");
 
         String jsonRequest = objectMapper.writeValueAsString(userDto);
@@ -99,6 +112,8 @@ public class UserControllerIntegrationTest {
                         .content(jsonRequest)
         )
         .andExpect(status().isBadRequest());
+
+        assertTrue(userRepository.findAll().isEmpty());
     }
 
     @Test
@@ -114,7 +129,8 @@ public class UserControllerIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    @WithMockUser(username = "admin", roles = {"ADMIN"}) // Explicit username and roles
+    @Transactional
     public void givenValidUserDTO_whenUpdateUserWithAdmin_thenReturnsOkStatus() throws Exception {
         UserDTO userDto = new UserDTO(
                 "ana@email.com",
@@ -123,11 +139,14 @@ public class UserControllerIntegrationTest {
                 "123 Main St",
                 "ana_login");
 
-        String jsonRequest = objectMapper.writeValueAsString(userDto);
-
         mockMvc.perform(put("/users/update/" + createdUserId)
-                        .contentType("application/json")
-                        .content(jsonRequest))
-                .andExpect(status().isOk());
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userDto)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.mensagem").value("Usuário atualizado com sucesso."));
     }
+
+
+
 }
