@@ -38,7 +38,7 @@ public class RestaurantController implements RestaurantApi{
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	
-	//TODO SWAGGER @Override
+	@Override
 	@PreAuthorize("hasRole('RESTAURANT_OWNER')")
 	@PostMapping
 	public ResponseEntity<Void> save(@Valid @RequestBody RestaurantDTO restaurantDTO) {
@@ -62,7 +62,7 @@ public class RestaurantController implements RestaurantApi{
 		return ResponseEntity.noContent().build();
 	}
 	
-	//TODO SWAGGER @Override
+	@Override
 	@PreAuthorize("hasRole('RESTAURANT_OWNER')")
 	@DeleteMapping
 	public ResponseEntity<Void> delete(){
@@ -85,7 +85,7 @@ public class RestaurantController implements RestaurantApi{
 		return ResponseEntity.ok(restaurantService.getRestaurantById(id));
 	}
 
-	//TODO SWAGGER @Override
+	@Override
 	@PreAuthorize("hasRole('RESTAURANT_OWNER')")
 	@GetMapping
 	public ResponseEntity<PaginatedResponseDTO<RestaurantResponseDTO>> getARestaurants(Pageable pageable) {

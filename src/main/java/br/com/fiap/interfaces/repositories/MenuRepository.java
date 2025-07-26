@@ -12,5 +12,5 @@ public interface MenuRepository extends JpaRepository<Menu, Long>{
 
     Optional<Menu> findById(Long id);
     
-    Page<Menu> findAllByRestaurant(Long restaurantId, Pageable pageable);
+    Page<Menu> findAllByRestaurantId(Long restaurantId, Pageable pageable);
 }

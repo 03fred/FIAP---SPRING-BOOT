@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import br.com.fiap.dto.MenuDTO;
 import br.com.fiap.dto.MenuResponseDTO;
 import br.com.fiap.dto.PaginatedResponseDTO;
+import br.com.fiap.exceptions.BusinessException;
 import br.com.fiap.exceptions.ResourceNotFoundException;
 import br.com.fiap.exceptions.UnauthorizedException;
 import br.com.fiap.interfaces.repositories.MenuRepository;
@@ -42,7 +43,7 @@ public class MenuServiceImpl implements MenuService {
 	public void save(MenuDTO menuDTO) {
 		AuthenticatedUser userAuth = (AuthenticatedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if(Objects.isNull(userAuth.getRestaurantId())){
-			throw new UnauthorizedException("Restaurante não cadastrado para esse acesso. Favor renove suas credenciais e tente novamente.");
+			throw new BusinessException("Restaurante não existe no token de acesso. Favor renove suas credenciais e tente novamente.");
 		}
 		
 		Restaurant restaurant = restaurantService.getRestaurant(userAuth.getRestaurantId());
@@ -110,7 +111,7 @@ public class MenuServiceImpl implements MenuService {
 	public PaginatedResponseDTO<MenuResponseDTO> getAllMenu(Pageable pageable) {
 		AuthenticatedUser userAuth = (AuthenticatedUser) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
-		Page<Menu> menuPage = menuRepository.findAllByRestaurant(userAuth.getRestaurantId(), pageable);
+		Page<Menu> menuPage = menuRepository.findAllByRestaurantId(userAuth.getRestaurantId(), pageable);
 
 		return getPage(menuPage);
 	}
