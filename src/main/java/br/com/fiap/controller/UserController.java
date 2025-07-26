@@ -81,6 +81,7 @@ public class UserController implements UserApi {
 		return ResponseEntity.ok(userService.getUserById(id));
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping("/update-partial/{id}")
 	public ResponseEntity<Map<String, String>> updatePartial(
 			@PathVariable Long id,
@@ -90,7 +91,7 @@ public class UserController implements UserApi {
 		return ResponseEntity.ok(Map.of("message", "Campo atualizado com sucesso."));
 	}
 
-
+	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping("/update-password/{id}")
 	public ResponseEntity<Map<String, String>> updatePassword(
 			@PathVariable Long id,

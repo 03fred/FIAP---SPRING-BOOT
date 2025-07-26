@@ -73,7 +73,7 @@ class MenuControllerTest {
 
 		doNothing().when(menuService).update(any(MenuDTO.class), eq(menuId));
 
-		mockMvc.perform(put("/menu/{id}", menuId).contentType(MediaType.APPLICATION_JSON)
+		mockMvc.perform(put("/menu/update/{id}", menuId).contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(menuDTO))).andExpect(status().isNoContent());
 
 		verify(menuService).update(any(MenuDTO.class), eq(menuId));
