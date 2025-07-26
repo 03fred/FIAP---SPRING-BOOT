@@ -69,7 +69,7 @@ class MenuServiceImplTest {
     	Set<Role> userTypesRoles = new HashSet<>(); 
     	userTypesRoles.add(new Role(EnumUserType.ADMIN.toString()));
  
-    	AuthenticatedUser authenticatedUser = new AuthenticatedUser(1l, username, role, null, userTypesRoles);
+    	AuthenticatedUser authenticatedUser = new AuthenticatedUser(1L, username, role, 1L, userTypesRoles);
     	
         Authentication authentication = new UsernamePasswordAuthenticationToken(
         		authenticatedUser, null, authenticatedUser.getAuthorities());
@@ -166,7 +166,7 @@ class MenuServiceImplTest {
 
         Pageable pageable = PageRequest.of(0, 10);
         Page<Menu> menuPage = new PageImpl<>(List.of(menu));
-        when(menuRepository.findAllByRestaurant(authenticatedRestaurantId, pageable)).thenReturn(menuPage);
+        when(menuRepository.findAllByRestaurantId(authenticatedRestaurantId, pageable)).thenReturn(menuPage);
 
 
         PaginatedResponseDTO<MenuResponseDTO> response = menuServiceImpl.getAllMenu(pageable); // Era menuServiceImpl
@@ -176,7 +176,7 @@ class MenuServiceImplTest {
         assertEquals(1, response.getContent().size());
         assertEquals(menu.getName(), response.getContent().get(0).name());
 
-        verify(menuRepository).findAllByRestaurant(authenticatedRestaurantId, pageable);
+        verify(menuRepository).findAllByRestaurantId(authenticatedRestaurantId, pageable);
     }
 
 
