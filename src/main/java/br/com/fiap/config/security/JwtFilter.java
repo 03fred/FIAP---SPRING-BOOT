@@ -2,6 +2,7 @@ package br.com.fiap.config.security;
 
 import java.io.IOException;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Component
+@Profile("!test")
 public class JwtFilter  extends OncePerRequestFilter{
 	
 	 private AuthService authService;
