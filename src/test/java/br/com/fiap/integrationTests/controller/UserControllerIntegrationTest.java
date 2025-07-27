@@ -1,6 +1,8 @@
 package br.com.fiap.integrationTests.controller;
 
+import br.com.fiap.dto.PasswordUpdateDTO;
 import br.com.fiap.dto.UserDTO;
+import br.com.fiap.dto.UserPartialUpdateDTO;
 import br.com.fiap.dto.UserUpdateDTO;
 import br.com.fiap.interfaces.repositories.RoleRepository;
 import br.com.fiap.interfaces.repositories.UserRepository;
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
@@ -26,10 +29,9 @@ import java.util.UUID;
 import static org.hamcrest.Matchers.hasItem;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -58,6 +60,10 @@ public class UserControllerIntegrationTest {
 
     private Long createdUserId;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+
     // Java
     @BeforeEach
     public void setupTestUser() {
@@ -74,7 +80,7 @@ public class UserControllerIntegrationTest {
 
         User user = new User();
         user.setEmail("original@email.com");
-        user.setPassword("originalPass123");
+        user.setPassword(passwordEncoder.encode("originalPass123"));
         user.setName("Original User");
         user.setAddress("123 Main St");
         user.setLogin("admin_" + UUID.randomUUID()); // <- aqui
@@ -179,13 +185,77 @@ public class UserControllerIntegrationTest {
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
-    public void testAccessProtectedEndpoint() throws Exception {
-        mockMvc.perform(put("/users/update/1"))
-                .andDo(print())
-                .andExpect(status().isOk());
+    public void givenValidUserId_whenDeleteUser_thenReturnsOkStatus() throws Exception {
+        mockMvc.perform(
+                    delete("/users/delete/" + createdUserId)
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.mensagem").value("Usuário excluído com sucesso."));
+
+        assertFalse(userRepository.findById(createdUserId).isPresent());
     }
 
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    public void givenValidUserId_whenGetUserById_thenReturnsOkStatus() throws Exception {
 
+        mockMvc.perform(
+                get("/users/detail/" + createdUserId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isOk());
 
+        assertTrue(userRepository.findById(createdUserId).isPresent());
+    }
 
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    public void givenAdminUser_whenRequestAllUsers_thenReturnsUsersAndOkStatus() throws Exception {
+        mockMvc.perform(get("/users/all")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content[0].email").value("original@email.com"))
+                .andExpect(jsonPath("$.content[0].name").value("Original User"));
+
+        // Optional DB check if needed
+        assertEquals(1, userRepository.findAll().size());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    public void givenAdminUser_whenUpdatePartialUser_thenReturnsOkStatus() throws Exception {
+        UserPartialUpdateDTO userPartialUpdateDTO = new UserPartialUpdateDTO(
+                "Updated user",
+                "updated@email.com",
+                "456 New St",
+                "updated_login"
+        );
+
+        mockMvc.perform(
+                patch("/users/update-partial/" + createdUserId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userPartialUpdateDTO))
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.message").value("Campo atualizado com sucesso.")
+        );
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    public void givenAdminUser_whenUpdatePassword_thenReturnsOkStatus() throws Exception {
+        PasswordUpdateDTO newPassword = new PasswordUpdateDTO(
+                "originalPass123",
+                "newPassword123",
+                "newPassword123"
+        );
+
+        mockMvc.perform(
+                        patch("/users/update-password/" + createdUserId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(newPassword))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.mensagem").value("Senha atualizada com sucesso."));
+    }
 }
