@@ -22,39 +22,31 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConf {
 
-	private JwtFilter jwtFilter;
-	
-	SecurityConf(JwtFilter jwtFilter){
-		this.jwtFilter = jwtFilter;
-	}
-	
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http
-				.csrf(AbstractHttpConfigurer::disable)
-				.authorizeHttpRequests(req -> req
-						.requestMatchers(
-								"/h2-console/**",
-								"/auth/**",
-								"/users/**",
-								"/v3/api-docs/**",
-								"/swagger-ui/**",
-								"/swagger-ui.html",
-								"/swagger-resources/**",
-								"/users_type/**",
-								"/webjars/**"
-						).permitAll()
-						.requestMatchers("/admin/**").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.POST, "users/create").permitAll()
-						.anyRequest().authenticated()
-				)
-				.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
-			     http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-
-		return http.build();
+	public SecurityFilterChain filterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception { 
+	    return http
+	            .csrf(AbstractHttpConfigurer::disable)
+	            .authorizeHttpRequests(
+	                    req -> req.requestMatchers(
+	                                    "/h2-console/**",
+	                                    "/auth/**",
+	                                    "/v3/api-docs/**",
+	                                    "/swagger-ui/**",
+	                                    "/swagger-ui.html",
+	                                    "/swagger-resources/**",
+	                                    "/users_type/**",
+	                                    "/webjars/**")
+	                            .permitAll()
+	                            .requestMatchers("/admin/**").hasRole("ADMIN")
+	                            .requestMatchers(HttpMethod.POST, "users/create").permitAll()
+	                            .anyRequest().authenticated())
+	            .sessionManagement(
+	                    sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+	            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+	            .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
+	            .build();
 	}
-
+	
 	@Bean
 	public RoleHierarchy roleHierarchy() {
 	    RoleHierarchyImpl roleHierarchyImpl = new RoleHierarchyImpl();
