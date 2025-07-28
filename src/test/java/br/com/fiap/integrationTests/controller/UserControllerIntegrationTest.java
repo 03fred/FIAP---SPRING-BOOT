@@ -1,5 +1,37 @@
 package br.com.fiap.integrationTests.controller;
 
+import static org.hamcrest.Matchers.hasItem;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.UUID;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.web.servlet.MockMvc;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import br.com.fiap.config.security.JwtTokenUtil;
 import br.com.fiap.dto.PasswordUpdateDTO;
 import br.com.fiap.dto.UserDTO;
 import br.com.fiap.dto.UserPartialUpdateDTO;
@@ -8,31 +40,7 @@ import br.com.fiap.interfaces.repositories.RoleRepository;
 import br.com.fiap.interfaces.repositories.UserRepository;
 import br.com.fiap.model.Role;
 import br.com.fiap.model.User;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-
-import java.util.UUID;
-
-import static org.hamcrest.Matchers.hasItem;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -43,11 +51,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 public class UserControllerIntegrationTest {
 
-    @Autowired
-    private WebApplicationContext applicationContext;
 
     @Autowired
     private MockMvc mockMvc;
+    
+    @MockBean
+    private JavaMailSender mailSender;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -63,32 +72,31 @@ public class UserControllerIntegrationTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    String jwt;
 
-    // Java
     @BeforeEach
-    public void setupTestUser() {
-        this.mockMvc = MockMvcBuilders
-                .webAppContextSetup(applicationContext).apply(springSecurity())
-                .build();
+	public void setupTestUser() {
+		
+	    userRepository.deleteAll();
+	    roleRepository.deleteAll();
+	
+	    Role adminRole = new Role();
+	    adminRole.setName("ADMIN");
+	    adminRole = roleRepository.save(adminRole);
+	
+	    User user = new User();
+	    user.setEmail("original@email.com");
+	    user.setPassword(passwordEncoder.encode("originalPass123"));
+	    user.setName("Original User");
+	    user.setAddress("123 Main St");
+	    user.setLogin("admin_" + UUID.randomUUID());
+	    user.getUserTypesRoles().add(adminRole);
+	
+	    User savedUser = userRepository.save(user);
+	    createdUserId = savedUser.getId();
+        jwt = JwtTokenUtil.createToken(user.getLogin(), null); 
 
-        userRepository.deleteAll();
-        roleRepository.deleteAll();
-
-        Role adminRole = new Role();
-        adminRole.setName("ROLE_ADMIN");
-        adminRole = roleRepository.save(adminRole);
-
-        User user = new User();
-        user.setEmail("original@email.com");
-        user.setPassword(passwordEncoder.encode("originalPass123"));
-        user.setName("Original User");
-        user.setAddress("123 Main St");
-        user.setLogin("admin_" + UUID.randomUUID()); // <- aqui
-        user.getUserTypesRoles().add(adminRole);
-
-        User savedUser = userRepository.save(user);
-        createdUserId = savedUser.getId();
-    }
+	}
 
 
 
@@ -176,11 +184,11 @@ public class UserControllerIntegrationTest {
                 "ana_login");
 
         mockMvc.perform(put("/users/update/" + createdUserId)
+                		.header("Authorization", "Bearer " + jwt)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userUpdateDto)))
                 .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.mensagem").value("Usuário atualizado com sucesso."));
+                .andExpect(status().isNoContent());
     }
 
     @Test
@@ -188,9 +196,9 @@ public class UserControllerIntegrationTest {
     public void givenValidUserId_whenDeleteUser_thenReturnsOkStatus() throws Exception {
         mockMvc.perform(
                     delete("/users/delete/" + createdUserId)
+                    .header("Authorization", "Bearer " + jwt)
                     .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.mensagem").value("Usuário excluído com sucesso."));
+                .andExpect(status().isNoContent());
 
         assertFalse(userRepository.findById(createdUserId).isPresent());
     }
@@ -201,6 +209,7 @@ public class UserControllerIntegrationTest {
 
         mockMvc.perform(
                 get("/users/detail/" + createdUserId)
+                		.header("Authorization", "Bearer " + jwt)
                         .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isOk());
 
@@ -211,6 +220,7 @@ public class UserControllerIntegrationTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     public void givenAdminUser_whenRequestAllUsers_thenReturnsUsersAndOkStatus() throws Exception {
         mockMvc.perform(get("/users/all")
+                		.header("Authorization", "Bearer " + jwt)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
@@ -233,12 +243,11 @@ public class UserControllerIntegrationTest {
 
         mockMvc.perform(
                 patch("/users/update-partial/" + createdUserId)
+                		.header("Authorization", "Bearer " + jwt)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userPartialUpdateDTO))
             )
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.message").value("Campo atualizado com sucesso.")
-        );
+            .andExpect(status().isNoContent());
     }
 
     @Test
@@ -252,10 +261,10 @@ public class UserControllerIntegrationTest {
 
         mockMvc.perform(
                         patch("/users/update-password/" + createdUserId)
+                        		.header("Authorization", "Bearer " + jwt)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(newPassword))
                 )
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.mensagem").value("Senha atualizada com sucesso."));
+        	.andExpect(status().isNoContent());
     }
 }

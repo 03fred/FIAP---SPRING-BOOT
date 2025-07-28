@@ -1,19 +1,23 @@
 package br.com.fiap.controller;
 
 
+import java.util.Map;
 import java.util.Objects;
 
 // Removed Swagger imports from here
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.fiap.config.security.JwtTokenUtil;
 import br.com.fiap.dto.UserAuthorizationDTO;
+import br.com.fiap.dto.UserForgotPasswordDTO;
 import br.com.fiap.exceptions.ResourceNotFoundException;
 import br.com.fiap.interfaces.services.AuthService;
 import br.com.fiap.interfaces.services.RestaurantService;
@@ -63,4 +67,16 @@ public class AuthController implements AuthApi {
 		
 		restaurantService.findByIdAndRestaurantOwnerId(ownerId, restaurantId);
 	}
+	
+	@PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@Valid @RequestBody UserForgotPasswordDTO userAuth) {
+        authService.requestPasswordReset(userAuth.identificator());
+        return ResponseEntity.status(HttpStatus.CREATED).body("E-mail enviado com instruções para redefinição");
+    }
+	
+	 @PostMapping("/reset-password")
+	    public ResponseEntity<String> resetPassword(@RequestParam String token, @Valid @RequestBody UserAuthorizationDTO userAuth) {
+	        authService.resetPassword(token, userAuth);
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	    }
 }

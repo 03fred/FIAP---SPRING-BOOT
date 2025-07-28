@@ -1,6 +1,5 @@
 package br.com.fiap.config.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -24,35 +23,30 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConf {
 
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http,
-										   @Autowired(required = false) JwtFilter jwtFilter) throws Exception {
-		http
-				.csrf(AbstractHttpConfigurer::disable)
-				.authorizeHttpRequests(req -> req
-						.requestMatchers(
-								"/h2-console/**",
-								"/auth/**",
-								"/v3/api-docs/**",
-								"/swagger-ui/**",
-								"/swagger-ui.html",
-								"/swagger-resources/**",
-								"/users_type/**",
-								"/webjars/**"
-						).permitAll()
-						.requestMatchers("/admin/**").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.POST, "users/create").permitAll()
-						.anyRequest().authenticated()
-				)
-				.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
-
-		if (jwtFilter != null) {
-			http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-		}
-
-		return http.build();
+	public SecurityFilterChain filterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception { 
+	    return http
+	            .csrf(AbstractHttpConfigurer::disable)
+	            .authorizeHttpRequests(
+	                    req -> req.requestMatchers(
+	                                    "/h2-console/**",
+	                                    "/auth/**",
+	                                    "/v3/api-docs/**",
+	                                    "/swagger-ui/**",
+	                                    "/swagger-ui.html",
+	                                    "/swagger-resources/**",
+	                                    "/users_type/**",
+	                                    "/webjars/**")
+	                            .permitAll()
+	                            .requestMatchers("/admin/**").hasRole("ADMIN")
+	                            .requestMatchers(HttpMethod.POST, "users/create").permitAll()
+	                            .anyRequest().authenticated())
+	            .sessionManagement(
+	                    sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+	            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+	            .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
+	            .build();
 	}
-
+	
 	@Bean
 	public RoleHierarchy roleHierarchy() {
 	    RoleHierarchyImpl roleHierarchyImpl = new RoleHierarchyImpl();
