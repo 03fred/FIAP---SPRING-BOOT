@@ -1,4 +1,4 @@
-name: Validate Coverage Before Merge
+name: Validate Coverage Before Merge[teste]
 
 on:
   push:
