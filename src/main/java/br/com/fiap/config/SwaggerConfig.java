@@ -17,13 +17,13 @@ import org.springframework.context.annotation.Configuration;
                 description = "API desenvolvida para o projeto de pós-graduação da FIAP.",
                 contact = @Contact(name = "GitHub", url = "https://github.com/03fred/FIAP---SPRING-BOOT")
         ),
-        security = @SecurityRequirement(name = "bearerAuth") // 👈 Define o uso global do Bearer Token
+        security = @SecurityRequirement(name = "bearerAuth") 
 )
 @SecurityScheme(
-        name = "bearerAuth", // 👈 Nome referenciado nos @SecurityRequirement dos endpoints
+        name = "bearerAuth", 
         type = SecuritySchemeType.HTTP,
         scheme = "bearer",
-        bearerFormat = "JWT", // 👈 Apenas informativo (pode omitir)
+        bearerFormat = "JWT",
         in = SecuritySchemeIn.HEADER
 )
 public class SwaggerConfig {

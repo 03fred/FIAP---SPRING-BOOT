@@ -1,6 +1,5 @@
 package br.com.fiap.config.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -23,15 +22,21 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConf {
 
+	private JwtFilter jwtFilter;
+	
+	SecurityConf(JwtFilter jwtFilter){
+		this.jwtFilter = jwtFilter;
+	}
+	
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http,
-										   @Autowired(required = false) JwtFilter jwtFilter) throws Exception {
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http
 				.csrf(AbstractHttpConfigurer::disable)
 				.authorizeHttpRequests(req -> req
 						.requestMatchers(
 								"/h2-console/**",
 								"/auth/**",
+								"/users/**",
 								"/v3/api-docs/**",
 								"/swagger-ui/**",
 								"/swagger-ui.html",
@@ -45,10 +50,7 @@ public class SecurityConf {
 				)
 				.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
-
-		if (jwtFilter != null) {
-			http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-		}
+			     http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();
 	}
