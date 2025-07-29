@@ -1,7 +1,9 @@
 package br.com.fiap.model;
 
+import java.time.LocalTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import br.com.fiap.dto.RestaurantDTO;
@@ -46,8 +48,13 @@ public class Restaurant {
     @Column(nullable = false)
     private String typeKitchen;
 
-    @Column
-    private String openingHours;
+    @JsonFormat(pattern = "HH:mm")
+    @Column(name = "opening_time", nullable = false)
+    private LocalTime openingTime;
+
+    @JsonFormat(pattern = "HH:mm")
+    @Column(name = "closing_time", nullable = false)
+    private LocalTime closingTime;
 
     @JsonManagedReference
     @ManyToOne(fetch = FetchType.LAZY)
@@ -59,7 +66,8 @@ public class Restaurant {
 
     public Restaurant(RestaurantDTO restaurantDTO, User user) {
         this.address = restaurantDTO.adress();
-        this.openingHours = restaurantDTO.openingHours();
+        this.openingTime = restaurantDTO.openingTime();
+        this.closingTime = restaurantDTO.closingTime();
         this.name = restaurantDTO.name();
         this.typeKitchen = restaurantDTO.typeKitchen();
         this.restaurantOwner = user;

@@ -1,21 +1,17 @@
 package br.com.fiap.services;
 
-import static br.com.fiap.factory.MenuFactory.createMenu;
-import static br.com.fiap.factory.MenuFactory.createMenuDTO;
-import static br.com.fiap.factory.RestaurantFactory.createRestaurant;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
+import br.com.fiap.dto.MenuDTO;
+import br.com.fiap.dto.MenuResponseDTO;
+import br.com.fiap.dto.PaginatedResponseDTO;
+import br.com.fiap.exceptions.ResourceNotFoundException;
+import br.com.fiap.factory.MenuFactory;
+import br.com.fiap.interfaces.repositories.MenuRepository;
+import br.com.fiap.interfaces.services.RestaurantService;
+import br.com.fiap.model.AuthenticatedUser;
+import br.com.fiap.model.Menu;
+import br.com.fiap.model.Restaurant;
+import br.com.fiap.model.Role;
+import br.com.fiap.model.enums.EnumUserType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,17 +27,24 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import br.com.fiap.dto.MenuDTO;
-import br.com.fiap.dto.MenuResponseDTO;
-import br.com.fiap.dto.PaginatedResponseDTO;
-import br.com.fiap.exceptions.ResourceNotFoundException;
-import br.com.fiap.interfaces.repositories.MenuRepository;
-import br.com.fiap.interfaces.services.RestaurantService;
-import br.com.fiap.model.AuthenticatedUser;
-import br.com.fiap.model.Menu;
-import br.com.fiap.model.Restaurant;
-import br.com.fiap.model.Role;
-import br.com.fiap.model.enums.EnumUserType;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import static br.com.fiap.factory.MenuFactory.createMenu;
+import static br.com.fiap.factory.MenuFactory.createMenuDTO;
+import static br.com.fiap.factory.RestaurantFactory.createRestaurant;
+import static br.com.fiap.factory.RestaurantFactory.createRestaurantDTO;
+import static br.com.fiap.factory.UserFactory.createUserMock;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -179,5 +182,37 @@ class MenuServiceImplTest {
         verify(menuRepository).findAllByRestaurantId(authenticatedRestaurantId, pageable);
     }
 
+    @Test
+    void testAllArgsConstructorAndGetters() {
+        Restaurant restaurant = new Restaurant();
+        restaurant.setId(1L);
+        restaurant.setName("Restaurante X");
+
+        Menu menu = new Menu(MenuFactory.createMenuDTO(), restaurant);
+
+        assertEquals("Hamburguer", menu.getName());
+        assertEquals(restaurant, menu.getRestaurant());
+    }
+
+    @Test
+    void testEqualsAndHashCode() {
+        Restaurant restaurant = createRestaurant();
+
+        Menu menu1 = new Menu(MenuFactory.createMenuDTO(), restaurant);
+        Menu menu2 = new Menu(MenuFactory.createMenuDTO(), restaurant);
+
+        assertEquals(menu1, menu2);
+        assertEquals(menu1.hashCode(), menu2.hashCode());
+    }
+
+    @Test
+    void testToString() {
+        Restaurant restaurant = new Restaurant(createRestaurantDTO(), createUserMock());
+
+        Menu menu = new Menu(MenuFactory.createMenuDTO(), restaurant);
+
+        assertTrue(menu.toString().contains("Menu"));
+        assertTrue(menu.toString().contains("Lanche"));
+    }
 
 }

@@ -3,6 +3,7 @@ package br.com.fiap.factory;
 import br.com.fiap.dto.RestaurantDTO;
 import br.com.fiap.model.Restaurant;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 
 import static br.com.fiap.factory.UserFactory.createUser;
@@ -14,7 +15,8 @@ public class RestaurantFactory {
                 "Ana",
                 "Address 1",
                 "Fast Food",
-                "11 am");
+                LocalTime.of(17, 0),
+                LocalTime.of(23, 0));
     }
 
     public static Restaurant createRestaurant() {
@@ -23,7 +25,8 @@ public class RestaurantFactory {
                 "Ana",
                 "Address 1",
                 "Fast Food",
-                "11 am",
+                LocalTime.of(17, 0),
+                LocalTime.of(23, 0),
                 createUser(1L),
                 new ArrayList<>()
         );

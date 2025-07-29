@@ -2,7 +2,13 @@ package br.com.fiap.factory;
 
 import br.com.fiap.dto.UserDTO;
 import br.com.fiap.dto.UserUpdateDTO;
+import br.com.fiap.model.Restaurant;
+import br.com.fiap.model.Role;
 import br.com.fiap.model.User;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 public class UserFactory {
 
@@ -29,5 +35,31 @@ public class UserFactory {
 
     public static UserUpdateDTO UserUpdateDTOMock() {
         return new UserUpdateDTO("Ana Maria", "novo@email.com", "anaNovo", "rua 2");
+    }
+
+    public static UserDTO getUserDTO() {
+        UserDTO userDTO = new UserDTO(
+                "john.doe@example.com",
+                "john.doe@example.com",
+                "John Doe",
+                "Rua das Flores, 123",
+                "johndoe"
+        );
+        return userDTO;
+    }
+
+    public static User getUser(Set<Role> roles, List<Restaurant> restaurants, Date updateDate) {
+        User user = new User(
+                1L,
+                "jane.doe@example.com",
+                "Jane Doe",
+                "janedoe",
+                "pass123",
+                updateDate,
+                "Av. Paulista, 1000",
+                roles,
+                restaurants
+        );
+        return user;
     }
 }

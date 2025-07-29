@@ -1,7 +1,6 @@
 package br.com.fiap.services;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +48,8 @@ public class RestaurantServiceImpl implements RestaurantService {
 				restaurant.getName(),
 				restaurant.getAddress(),
 				restaurant.getTypeKitchen(),
-				restaurant.getOpeningHours()
+				restaurant.getOpeningTime(),
+				restaurant.getClosingTime()
 		);
 	}
 
@@ -98,7 +98,8 @@ public class RestaurantServiceImpl implements RestaurantService {
 	private Restaurant getRestaurant(RestaurantDTO restaurantDTO, Restaurant restaurant) {
 		restaurant.setAddress(restaurantDTO.adress());
 		restaurant.setName(restaurantDTO.name());
-		restaurant.setOpeningHours(restaurantDTO.openingHours());
+		restaurant.setOpeningTime(restaurantDTO.openingTime());
+		restaurant.setClosingTime(restaurantDTO.closingTime());
 		restaurant.setTypeKitchen(restaurantDTO.typeKitchen());
 		return restaurant;
 	}
@@ -123,8 +124,10 @@ public class RestaurantServiceImpl implements RestaurantService {
 				.map(restaurant -> new RestaurantResponseDTO(
 						restaurant.getName(),
 						restaurant.getAddress(),
-						restaurant.getOpeningHours(),
-						restaurant.getTypeKitchen()))
+						restaurant.getTypeKitchen(),
+						restaurant.getOpeningTime(),
+						restaurant.getClosingTime()
+						))
 				.collect(Collectors.toList());
 
 		return new PaginatedResponseDTO<>(
