@@ -92,7 +92,7 @@ public class MenuServiceImpl implements MenuService {
 		AuthenticatedUser userAuth = (AuthenticatedUser) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
 		
-		if (!userAuth.hasRoleAdmin() && !menu.getRestaurant().getRestaurantOwner().equals(userAuth.getId())) {
+		if (!userAuth.hasRoleAdmin() && !menu.getRestaurant().getRestaurantOwner().getId().equals(userAuth.getId())) {
 			throw new UnauthorizedException("Esse menu não pertence ao usuário logado.");
 		}
 	}
