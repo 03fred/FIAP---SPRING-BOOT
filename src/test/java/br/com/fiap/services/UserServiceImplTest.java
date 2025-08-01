@@ -107,7 +107,13 @@ class UserServiceImplTest {
         assertEquals(dto.email(), user.getEmail());
         assertEquals(dto.name(), user.getName());
         assertEquals(dto.login(), user.getLogin());
-        assertEquals(dto.address(), user.getAddress());
+        assertEquals(dto.address().street(), user.getAddress().getStreet());
+        assertEquals(dto.address().number(), user.getAddress().getNumber());
+        assertEquals(dto.address().neighborhood(), user.getAddress().getNeighborhood());
+        assertEquals(dto.address().city(), user.getAddress().getCity());
+        assertEquals(dto.address().state(), user.getAddress().getState());
+        assertEquals(dto.address().zipCode(), user.getAddress().getZipCode());
+
     }
 
     @Test
@@ -243,7 +249,13 @@ class UserServiceImplTest {
 
         assertEquals(dto.name(), user.getName());
         assertEquals(dto.email(), user.getEmail());
-        assertEquals(dto.address(), user.getAddress());
+        assertEquals(dto.address().street(), user.getAddress().getStreet());
+        assertEquals(dto.address().number(), user.getAddress().getNumber());
+        assertEquals(dto.address().neighborhood(), user.getAddress().getNeighborhood());
+        assertEquals(dto.address().city(), user.getAddress().getCity());
+        assertEquals(dto.address().state(), user.getAddress().getState());
+        assertEquals(dto.address().zipCode(), user.getAddress().getZipCode());
+
         assertEquals(dto.login(), user.getLogin());
         verify(userRepository).save(user);
     }
@@ -296,7 +308,7 @@ class UserServiceImplTest {
         assertEquals("John Doe", user.getName());
         assertEquals("john.doe@example.com", user.getEmail());
         assertEquals("johndoe", user.getLogin());
-        assertEquals("Rua das Flores, 123", user.getAddress().getStreet());
+        assertEquals(userDTO.address(), user.getAddress().toDTO());
         assertNotNull(user.getDtUpdateRow());
     }
 

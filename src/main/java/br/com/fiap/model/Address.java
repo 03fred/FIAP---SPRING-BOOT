@@ -1,5 +1,6 @@
 package br.com.fiap.model;
 
+import br.com.fiap.dto.AddressDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -40,4 +41,16 @@ public class Address {
     @JsonIgnore
     @OneToOne(mappedBy = "address", fetch = FetchType.LAZY)
     private User user;
+
+    public AddressDTO toDTO() {
+        return new AddressDTO(
+                this.street,
+                this.number,
+                this.neighborhood,
+                this.city,
+                this.state,
+                this.zipCode
+        );
+    }
+
 }
