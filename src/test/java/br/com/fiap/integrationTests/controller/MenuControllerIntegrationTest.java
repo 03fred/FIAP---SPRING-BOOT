@@ -11,6 +11,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
+import br.com.fiap.factory.AddressFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,7 +103,7 @@ public class MenuControllerIntegrationTest {
 		admin.setEmail("admin@admin.com");
 		admin.setPassword(passwordEncoder.encode("admin123"));
 		admin.setName("Admin");
-		admin.setAddress("Admin Address");
+		admin.setAddress(AddressFactory.getMockAddress(admin));
 		admin.getUserTypesRoles().add(adminRole);
 		userRepository.save(admin);
 
@@ -112,7 +113,7 @@ public class MenuControllerIntegrationTest {
 		owner.setEmail("owner@owner.com");
 		owner.setPassword(passwordEncoder.encode("owner123"));
 		owner.setName("Owner");
-		owner.setAddress("Owner Address");
+		owner.setAddress(AddressFactory.getMockAddress(owner));
 		owner.getUserTypesRoles().add(ownerRole);
 		owner = userRepository.save(owner);
 

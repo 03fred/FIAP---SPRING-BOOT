@@ -5,6 +5,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import br.com.fiap.dto.*;
+import br.com.fiap.model.Address;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -13,12 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import br.com.fiap.dto.PaginatedResponseDTO;
-import br.com.fiap.dto.PasswordUpdateDTO;
-import br.com.fiap.dto.UserDTO;
-import br.com.fiap.dto.UserPartialUpdateDTO;
-import br.com.fiap.dto.UserResponseDTO;
-import br.com.fiap.dto.UserUpdateDTO;
+import br.com.fiap.mapper.AddressMapper;
 import br.com.fiap.exceptions.ConflictException;
 import br.com.fiap.exceptions.ResourceNotFoundException;
 import br.com.fiap.interfaces.repositories.RoleRepository;
@@ -73,8 +70,10 @@ public class UserServiceImpl implements UserService {
 
 		user.setEmail(userUpdateDTO.email());
 		user.setName(userUpdateDTO.name());
-		user.setAddress(userUpdateDTO.address());
 		user.setLogin(userUpdateDTO.login());
+		AddressDTO ad = userUpdateDTO.address();
+		user.setAddress(AddressMapper.toEntity(userUpdateDTO.address(), user)
+);
 		var save = this.userRepository.save(user);
 		Assert.notNull(save, "Erro ao atualizaro o usuário com o email: " + user.getEmail() + ".");
 
@@ -89,20 +88,29 @@ public class UserServiceImpl implements UserService {
 
 	public PaginatedResponseDTO<UserResponseDTO> getAllUsers(Pageable pageable) {
 		Page<User> userPage = userRepository.findAll(pageable);
+
 		List<UserResponseDTO> userResponseDTOs = userPage.getContent().stream()
-				.map(user -> new UserResponseDTO(user.getId(), user.getEmail(), user.getName(), user.getAddress()))
+				.map(user -> new UserResponseDTO(
+						user.getId(),
+						user.getEmail(),
+						user.getName(),
+						AddressMapper.toDTO(user.getAddress())
+				))
 				.collect(Collectors.toList());
 
-		return new PaginatedResponseDTO<>(userResponseDTOs, userPage.getTotalElements(), userPage.getNumber(),
+		return new PaginatedResponseDTO<>(userResponseDTOs,
+				userPage.getTotalElements(),
+				userPage.getNumber(),
 				userPage.getSize());
 	}
+
 
 	@Override
 	public UserResponseDTO getUserById(Long id) {
 		var user = userRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o id: " + id));
 
-		return new UserResponseDTO(user.getId(), user.getEmail(), user.getName(), user.getAddress());
+		return new UserResponseDTO(user.getId(), user.getEmail(), user.getName(), AddressMapper.toDTO(user.getAddress()));
 	}
 
 	@Override
@@ -128,7 +136,7 @@ public class UserServiceImpl implements UserService {
 		user.setEmail(userDto.email());
 		user.setPassword(passwordCrypto);
 		user.setName(userDto.name());
-		user.setAddress(userDto.address());
+		user.setAddress(AddressMapper.toEntity(userDto.address(), user));
 		user.setLogin(userDto.login());
 		return user;
 	}
@@ -152,8 +160,8 @@ public class UserServiceImpl implements UserService {
 			changed = true;
 		}
 
-		if (dto.address() != null && !dto.address().isBlank()) {
-			user.setAddress(dto.address());
+		if (dto.address() != null) {
+			user.setAddress(AddressMapper.toEntity(dto.address(), user));
 			changed = true;
 		}
 
@@ -165,9 +173,13 @@ public class UserServiceImpl implements UserService {
 			changed = true;
 		}
 
-		if (!changed) {
+		if ((dto.name() == null || dto.name().isBlank()) &&
+				(dto.email() == null || dto.email().isBlank()) &&
+				(dto.login() == null || dto.login().isBlank()) &&
+				(dto.address() == null || AddressMapper.isEmpty(dto.address()))) {
 			throw new IllegalArgumentException("Nenhum campo válido para atualizar foi enviado.");
 		}
+
 
 		userRepository.save(user);
 	}
@@ -190,5 +202,4 @@ public class UserServiceImpl implements UserService {
 		userRepository.save(user);
 
 	}
-
 }

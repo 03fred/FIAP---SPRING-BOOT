@@ -25,16 +25,16 @@ public class UserFactory {
         user.setEmail("ana@email.com");
         user.setLogin("anaLogin");
         user.setPassword("hashedSenha");  // Importante: senha deve bater com o when
-        user.setAddress("rua 1");
+        user.setAddress(AddressFactory.getMockAddress(user));
         return user;
     }
 
     public static UserDTO createUserDTOMock() {
-        return new UserDTO("Ana", "ana@email.com", "ana123", "senha", "rua 1");
+        return new UserDTO("Ana", "ana@email.com", "ana123", AddressFactory.getMockAddressDTO(), "rua 1");
     }
 
     public static UserUpdateDTO UserUpdateDTOMock() {
-        return new UserUpdateDTO("Ana Maria", "novo@email.com", "anaNovo", "rua 2");
+        return new UserUpdateDTO("Ana Maria", "novo@email.com", AddressFactory.getMockAddressDTO(), "rua 2");
     }
 
     public static UserDTO getUserDTO() {
@@ -42,7 +42,7 @@ public class UserFactory {
                 "john.doe@example.com",
                 "john.doe@example.com",
                 "John Doe",
-                "Rua das Flores, 123",
+                AddressFactory.getMockAddressDTO(),
                 "johndoe"
         );
         return userDTO;
@@ -56,7 +56,7 @@ public class UserFactory {
                 "janedoe",
                 "pass123",
                 updateDate,
-                "Av. Paulista, 1000",
+                AddressFactory.getMockAddress(),
                 roles,
                 restaurants
         );

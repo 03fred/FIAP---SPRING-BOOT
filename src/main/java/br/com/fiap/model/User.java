@@ -5,25 +5,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import br.com.fiap.dto.AddressDTO;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import br.com.fiap.dto.UserDTO;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -67,9 +54,11 @@ public class User {
     public void onUpdate() {
         this.dtUpdateRow = new Date();
     }
-    
-    @Column(nullable = false)
-    private String address;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id", referencedColumnName = "id")
+    private Address address;
+
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(
@@ -83,24 +72,47 @@ public class User {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @OneToMany(mappedBy = "restaurantOwner", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Restaurant> restaurant;
-    
-    
+
+
     public User(UserDTO userDto, String passwordCrypto) {
-    	this.email = userDto.email();
-    	this.name = userDto.name();
-    	this.login = userDto.login();
-    	this.password = passwordCrypto;
-    	this.address = userDto.address();
-    	this.dtUpdateRow = new Date();
+        this.email = userDto.email();
+        this.name = userDto.name();
+        this.login = userDto.login();
+        this.password = passwordCrypto;
+        this.dtUpdateRow = new Date();
+
+        AddressDTO ad = userDto.address();
+        this.address = new Address(
+                null,
+                ad.street(),
+                ad.number(),
+                ad.neighborhood(),
+                ad.city(),
+                ad.state(),
+                ad.zipCode(),
+                this
+        );
     }
 
     public User(UserDTO userDto) {
-    	this.email = userDto.email();
-    	this.name = userDto.name();
-    	this.login = userDto.login();
-    	this.address = userDto.address();
-    	this.dtUpdateRow = new Date();
+        this.email = userDto.email();
+        this.name = userDto.name();
+        this.login = userDto.login();
+        this.dtUpdateRow = new Date();
+
+        AddressDTO ad = userDto.address();
+        this.address = new Address(
+                null,
+                ad.street(),
+                ad.number(),
+                ad.neighborhood(),
+                ad.city(),
+                ad.state(),
+                ad.zipCode(),
+                this
+        );
     }
+
 
     public void removeRole(Role role) {
         this.userTypesRoles.remove(role);

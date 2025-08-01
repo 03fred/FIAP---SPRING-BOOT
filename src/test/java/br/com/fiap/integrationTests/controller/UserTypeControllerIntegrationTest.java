@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.UUID;
 
+import br.com.fiap.factory.AddressFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +82,7 @@ public class UserTypeControllerIntegrationTest {
         user.setEmail("admin@example.com");
         user.setPassword(passwordEncoder.encode("adminPass"));
         user.setName("Admin User");
-        user.setAddress("Rua Teste, 123");
+        user.setAddress(AddressFactory.getMockAddress());
         user.getUserTypesRoles().add(adminRole);
         userRepository.save(user);
 
@@ -91,7 +92,7 @@ public class UserTypeControllerIntegrationTest {
         testUser.setEmail("test@example.com");
         testUser.setPassword(passwordEncoder.encode("testPass"));
         testUser.setName("Test User");
-        testUser.setAddress("Rua Teste 456");
+        testUser.setAddress(AddressFactory.getMockAddress());
         userRepository.save(testUser);
 
         jwt = JwtTokenUtil.createToken(user.getLogin(), null);

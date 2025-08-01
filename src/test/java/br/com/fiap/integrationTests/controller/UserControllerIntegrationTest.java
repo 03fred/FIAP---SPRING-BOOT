@@ -15,6 +15,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.UUID;
 
+import br.com.fiap.dto.*;
+import br.com.fiap.factory.AddressFactory;
+import br.com.fiap.model.Address;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +35,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.fiap.config.security.JwtTokenUtil;
-import br.com.fiap.dto.PasswordUpdateDTO;
-import br.com.fiap.dto.UserDTO;
-import br.com.fiap.dto.UserPartialUpdateDTO;
-import br.com.fiap.dto.UserUpdateDTO;
 import br.com.fiap.interfaces.repositories.RoleRepository;
 import br.com.fiap.interfaces.repositories.UserRepository;
 import br.com.fiap.model.Role;
@@ -74,6 +73,7 @@ public class UserControllerIntegrationTest {
 
     String jwt;
 
+
     @BeforeEach
 	public void setupTestUser() {
 		
@@ -88,16 +88,15 @@ public class UserControllerIntegrationTest {
 	    user.setEmail("original@email.com");
 	    user.setPassword(passwordEncoder.encode("originalPass123"));
 	    user.setName("Original User");
-	    user.setAddress("123 Main St");
-	    user.setLogin("admin_" + UUID.randomUUID());
-	    user.getUserTypesRoles().add(adminRole);
-	
-	    User savedUser = userRepository.save(user);
+        user.setAddress(AddressFactory.getMockAddress(user));
+        user.setLogin("admin_" + UUID.randomUUID());
+        user.getUserTypesRoles().add(adminRole);
+
+        User savedUser = userRepository.save(user);
 	    createdUserId = savedUser.getId();
         jwt = JwtTokenUtil.createToken(user.getLogin(), null); 
 
 	}
-
 
 
     @Test
@@ -106,7 +105,7 @@ public class UserControllerIntegrationTest {
                 "ana@email.com",
                 "password123",
                 "Ana",
-                "123 Main St",
+                AddressFactory.getMockAddressDTO(),
                 "ana_login");
 
         mockMvc.perform(
@@ -126,7 +125,14 @@ public class UserControllerIntegrationTest {
                 "invalid-email",
                 "password123",
                 "Ana",
-                "123 Main St",
+                new AddressDTO(
+                        "Rua Exemplo",  // street
+                        "123",          // number
+                        "Bairro Legal", // neighborhood
+                        "São Paulo",    // city
+                        "SP",           // state
+                        "01000-000"     // zipCode
+                ),
                 "ana_login");
 
         String jsonRequest = objectMapper.writeValueAsString(userDto);
@@ -146,7 +152,7 @@ public class UserControllerIntegrationTest {
     public void givenEmptyUserDTO_whenCreateUser_thenReturnsBadRequestStatus() throws Exception {
         userRepository.deleteAll();
 
-        UserDTO userDto = new UserDTO("", "", "", "", "");
+        UserDTO userDto = new UserDTO("", "", "", new AddressDTO("", "", "", "", "", ""), "");
 
         String jsonRequest = objectMapper.writeValueAsString(userDto);
 
@@ -180,7 +186,7 @@ public class UserControllerIntegrationTest {
         UserUpdateDTO userUpdateDto = new UserUpdateDTO(
                 "ana@email.com",
                 "Ana",
-                "123 Main St",
+                AddressFactory.getMockAddressDTO(),
                 "ana_login");
 
         mockMvc.perform(put("/users/update/" + createdUserId)
@@ -238,7 +244,7 @@ public class UserControllerIntegrationTest {
                 "Updated user",
                 "updated@email.com",
                 "456 New St",
-                "updated_login"
+                AddressFactory.getMockAddressDTO()
         );
 
         mockMvc.perform(
