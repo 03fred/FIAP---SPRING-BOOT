@@ -3,6 +3,7 @@ package br.com.fiap.config;
 import java.util.HashSet;
 import java.util.Set;
 
+import br.com.fiap.model.Address;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -36,7 +37,16 @@ public class DataLoader implements CommandLineRunner {
 				adminUser.setName("admin");
 				adminUser.setEmail("admin@admin.com.br");
 				adminUser.setLogin("admin");
-				adminUser.setAddress("Rua - admin 123");
+				Address adminAddress = new Address(
+						null,
+						"Rua Admin",
+						"123",
+						"Centro",
+						"São Paulo",
+						"SP",
+						"01000-000",
+						adminUser
+				);
 				adminUser.setPassword(passwordEncoder.encode("123"));
 
 				Role roleAdmin = roleRepository.findByName(EnumUserType.ADMIN.toString())

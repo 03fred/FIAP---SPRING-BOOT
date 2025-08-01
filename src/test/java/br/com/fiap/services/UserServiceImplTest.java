@@ -8,6 +8,7 @@ import br.com.fiap.dto.UserResponseDTO;
 import br.com.fiap.dto.UserUpdateDTO;
 import br.com.fiap.exceptions.ConflictException;
 import br.com.fiap.exceptions.ResourceNotFoundException;
+import br.com.fiap.factory.AddressFactory;
 import br.com.fiap.interfaces.repositories.RoleRepository;
 import br.com.fiap.interfaces.repositories.UserRepository;
 import br.com.fiap.model.Restaurant;
@@ -140,7 +141,7 @@ class UserServiceImplTest {
         user.setId(1L);
         user.setEmail("a@a.com");
         user.setName("Ana");
-        user.setAddress("Rua 1");
+        user.setAddress(AddressFactory.getMockAddress(user));
         Pageable pageable = PageRequest.of(0, 10);
         Page<User> page = new PageImpl<>(List.of(user));
 
@@ -232,7 +233,7 @@ class UserServiceImplTest {
     @Test
     void shouldUpdateUserPartially() {
         User user = createUserMock();
-        UserPartialUpdateDTO dto = new UserPartialUpdateDTO("Nova Ana", "novo@email.com", "rua nova", "novoLogin");
+        UserPartialUpdateDTO dto = new UserPartialUpdateDTO("Nova Ana", "novo@email.com", "rua nova", AddressFactory.getMockAddressDTO());
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(userRepository.existsByEmail(dto.email())).thenReturn(false);
@@ -261,10 +262,17 @@ class UserServiceImplTest {
     @Test
     void shouldThrowWhenPartialUpdateLoginExists() {
         User user = createUserMock();
-        UserPartialUpdateDTO dto = new UserPartialUpdateDTO(null, null, null, "loginDuplicado");
+        user.setLogin("originalLogin");
+
+        UserPartialUpdateDTO dto = new UserPartialUpdateDTO(
+                "Novo Nome",
+                "novo@email.com",
+                "loginEmUso",
+                AddressFactory.getMockAddressDTO()
+        );
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(userRepository.existsByLogin(dto.login())).thenReturn(true);
+        when(userRepository.existsByLogin("loginEmUso")).thenReturn(true);
 
         assertThrows(ConflictException.class, () -> userService.updatePartial(1L, dto));
     }
@@ -272,7 +280,7 @@ class UserServiceImplTest {
     @Test
     void shouldThrowWhenNoFieldsToUpdate() {
         User user = createUserMock();
-        UserPartialUpdateDTO dto = new UserPartialUpdateDTO(" ", " ", " ", " ");
+        UserPartialUpdateDTO dto = new UserPartialUpdateDTO(" ", " ", " ", AddressFactory.getEmptyAddressDTO());
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
@@ -288,7 +296,7 @@ class UserServiceImplTest {
         assertEquals("John Doe", user.getName());
         assertEquals("john.doe@example.com", user.getEmail());
         assertEquals("johndoe", user.getLogin());
-        assertEquals("Rua das Flores, 123", user.getAddress());
+        assertEquals("Rua das Flores, 123", user.getAddress().getStreet());
         assertNotNull(user.getDtUpdateRow());
     }
 
@@ -307,7 +315,7 @@ class UserServiceImplTest {
         assertEquals("janedoe", user.getLogin());
         assertEquals("pass123", user.getPassword());
         assertEquals(updateDate, user.getDtUpdateRow());
-        assertEquals("Av. Paulista, 1000", user.getAddress());
+        assertEquals(AddressFactory.getMockAddress(), user.getAddress());
         assertEquals(roles, user.getUserTypesRoles());
         assertEquals(restaurants, user.getRestaurant());
     }
