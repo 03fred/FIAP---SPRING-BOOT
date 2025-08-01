@@ -20,11 +20,12 @@ import br.com.fiap.dto.MenuCreateDTO;
 import br.com.fiap.dto.MenuDTO;
 import br.com.fiap.dto.MenuResponseDTO;
 import br.com.fiap.interfaces.services.MenuService;
+import br.com.fiap.interfaces.swagger.MenuApi;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("menus")
-public class MenuController {
+public class MenuController implements MenuApi{
 
     @Autowired
     private MenuService menuService;

@@ -64,7 +64,8 @@ public class DataLoader implements CommandLineRunner {
 				userTypesRoles.add(roleRestauranteOwner);
 						
 				adminUser.setUserTypesRoles(userTypesRoles);
-
+                adminUser.setAddress(adminAddress);
+                
 				var save = userRepository.save(adminUser);
 
 				System.out.println("Admin user created successfully!");
