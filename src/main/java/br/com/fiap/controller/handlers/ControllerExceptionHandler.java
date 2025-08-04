@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
-import br.com.fiap.ErrorResponseDTO;
+import br.com.fiap.dto.ErrorResponseDTO;
 import br.com.fiap.dto.HttpMessageNotReadableExceptionDTO;
 import br.com.fiap.dto.ResourceNotFoundDTO;
 import br.com.fiap.dto.ValidationErrorDTO;

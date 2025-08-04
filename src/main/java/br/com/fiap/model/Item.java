@@ -1,5 +1,7 @@
 package br.com.fiap.model;
 
+import java.math.BigDecimal;
+
 import br.com.fiap.dto.ItemDTO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,10 +40,10 @@ public class Item{
     private String description;
 
     @Column(nullable = false)
-    private String price;
+    private BigDecimal price;
 
     @Column(nullable = false)
-    private String availability;
+    private Boolean availability;
 
     @Column
     private String photo;

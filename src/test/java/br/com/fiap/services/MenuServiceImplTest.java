@@ -27,6 +27,7 @@ import br.com.fiap.dto.ItemMenuDTO;
 import br.com.fiap.dto.MenuCreateDTO;
 import br.com.fiap.dto.MenuDTO;
 import br.com.fiap.dto.MenuResponseDTO;
+import br.com.fiap.exceptions.ResourceNotFoundException;
 import br.com.fiap.exceptions.UnauthorizedException;
 import br.com.fiap.interfaces.repositories.ItemRepository;
 import br.com.fiap.interfaces.repositories.MenuRepository;
@@ -37,7 +38,6 @@ import br.com.fiap.model.Menu;
 import br.com.fiap.model.Restaurant;
 import br.com.fiap.model.Role;
 import br.com.fiap.model.enums.EnumUserType;
-import jakarta.persistence.EntityNotFoundException;
 
 class MenuServiceImplTest {
 
@@ -120,7 +120,7 @@ class MenuServiceImplTest {
 	@Test
 	void shouldThrowWhenMenuNotFound() {
 		when(menuRepository.findById(999L)).thenReturn(Optional.empty());
-		assertThrows(EntityNotFoundException.class, () -> menuService.findById(999L));
+		assertThrows(ResourceNotFoundException.class, () -> menuService.findById(999L));
 	}
 
 	@Test

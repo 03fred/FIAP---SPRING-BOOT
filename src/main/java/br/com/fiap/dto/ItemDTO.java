@@ -1,5 +1,7 @@
 package br.com.fiap.dto;
 
+import java.math.BigDecimal;
+
 import jakarta.validation.constraints.NotNull;
 
 public record ItemDTO(
@@ -10,10 +12,11 @@ public record ItemDTO(
 		String description,
 
 		@NotNull(message = "O preço precisa ser informado")
-		String price,
+		BigDecimal price,
 
 		@NotNull(message = "Necessário informar a disponibilidade para pedir apenas no restaurante")
-		String availability,
+		Boolean availability,
+		
 
 		@NotNull(message = "Necessário informar o caminho da imagem")
 		String photo) {

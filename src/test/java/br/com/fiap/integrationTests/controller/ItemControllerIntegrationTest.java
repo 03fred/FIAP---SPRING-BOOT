@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
@@ -131,7 +132,7 @@ public class ItemControllerIntegrationTest {
 
 		jwtOwner = JwtTokenUtil.createToken(owner.getLogin(), restaurantId);
 
-		itemDTO = new ItemDTO("Pizza Margherita", "Tradicional com molho de tomate e manjericão", "39.90", "true",
+		itemDTO = new ItemDTO("Pizza Margherita", "Tradicional com molho de tomate e manjericão", new BigDecimal("39.90"), true,
 				"https://exemplo.com/imagem/pizza.jpg");
 
 		item = new Item(itemDTO, restaurant);

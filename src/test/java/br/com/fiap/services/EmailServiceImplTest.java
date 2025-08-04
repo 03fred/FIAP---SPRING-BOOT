@@ -35,7 +35,7 @@ class EmailServiceImplTest {
 
         assertEquals(toEmail, message.getTo()[0]);
         assertEquals("Recuperação de Senha", message.getSubject());
-        assertEquals("Clique no link para redefinir sua senha: http://localhost:8080/api/auth/reset-password?token=" + token,
+        assertEquals("Clique no link para redefinir sua senha: http://localhost:8081/auth/reset-password?token=" + token,
                 message.getText());
     }
 }
