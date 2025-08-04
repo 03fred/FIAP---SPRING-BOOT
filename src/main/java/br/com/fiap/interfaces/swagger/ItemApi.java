@@ -20,69 +20,69 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
-@Tag(name = "Cardápio")
+@Tag(name = "Item")
 public interface ItemApi {
 
-    @Operation(summary = "Cadastrar cardápio (ADMIN)",
-            description = "Permite que o administrador cadastre um cardápio em qualquer restaurante.")
+    @Operation(summary = "Cadastrar item (ADMIN)",
+            description = "Permite que o administrador cadastre um item em qualquer restaurante.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Cardápio cadastrado com sucesso"),
+            @ApiResponse(responseCode = "201", description = "item cadastrado com sucesso"),
             @ApiResponse(responseCode = "400", description = "Dados de entrada inválidos")
     })
     ResponseEntity<Void> saveByAdmin(@Valid @RequestBody ItemDTO ItemDTO,
                                      @PathVariable("restaurantId") Long restaurantId);
 
-    @Operation(summary = "Cadastrar cardápio (REST. OWNER)",
-            description = "Permite ao dono do restaurante cadastrar cardápios para seu próprio restaurante.")
+    @Operation(summary = "Cadastrar item (REST. OWNER)",
+            description = "Permite ao dono do restaurante cadastrar items para seu próprio restaurante.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Cardápio cadastrado com sucesso"),
+            @ApiResponse(responseCode = "201", description = "item cadastrado com sucesso"),
             @ApiResponse(responseCode = "400", description = "Dados de entrada inválidos")
     })
     ResponseEntity<Void> saveByOwner(@Valid @RequestBody ItemDTO ItemDTO);
 
-    @Operation(summary = "Atualizar cardápio",
-            description = "Atualiza um cardápio existente com base no ID fornecido.")
+    @Operation(summary = "Atualizar item",
+            description = "Atualiza um item existente com base no ID fornecido.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Cardápio atualizado com sucesso"),
+            @ApiResponse(responseCode = "204", description = "item atualizado com sucesso"),
             @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "404", description = "Cardápio não encontrado")
+            @ApiResponse(responseCode = "404", description = "item não encontrado")
     })
     ResponseEntity<Map<String, String>> update(@PathVariable("id") Long id,
                                                @Valid @RequestBody ItemDTO ItemDTO);
 
-    @Operation(summary = "Excluir cardápio",
-            description = "Exclui um cardápio com base no ID fornecido.")
+    @Operation(summary = "Excluir item",
+            description = "Exclui um item com base no ID fornecido.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Cardápio excluído com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Cardápio não encontrado")
+            @ApiResponse(responseCode = "204", description = "item excluído com sucesso"),
+            @ApiResponse(responseCode = "404", description = "item não encontrado")
     })
     ResponseEntity<Void> delete(@PathVariable("id") Long id);
 
-    @Operation(summary = "Listar todos os cardápios do sistema (ADMIN)",
-            description = "Lista todos os cardápios cadastrados no sistema.")
+    @Operation(summary = "Listar todos os items do sistema (ADMIN)",
+            description = "Lista todos os items cadastrados no sistema.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cardápios listados com sucesso"),
-            @ApiResponse(responseCode = "500", description = "Erro ao listar cardápios")
+            @ApiResponse(responseCode = "200", description = "items listados com sucesso"),
+            @ApiResponse(responseCode = "500", description = "Erro ao listar items")
     })
     @Parameter(in = ParameterIn.QUERY, name = "page", description = "Página atual", schema = @Schema(type = "integer", defaultValue = "0"))
     @Parameter(in = ParameterIn.QUERY, name = "size", description = "Itens por página", schema = @Schema(type = "integer", defaultValue = "10"))
     @Parameter(in = ParameterIn.QUERY, name = "sort", description = "Ordenação", array = @ArraySchema(schema = @Schema(type = "string", example = "name,asc")))
     ResponseEntity<PaginatedResponseDTO<ItemResponseDTO>> getAllMenus(@Parameter(hidden = true) Pageable pageable);
 
-    @Operation(summary = "Listar cardápios por restaurante (USER)",
-            description = "Lista os cardápios de um restaurante específico.")
+    @Operation(summary = "Listar items por restaurante (USER)",
+            description = "Lista os items de um restaurante específico.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cardápios listados com sucesso"),
+            @ApiResponse(responseCode = "200", description = "items listados com sucesso"),
             @ApiResponse(responseCode = "404", description = "Restaurante não encontrado")
     })
     ResponseEntity<PaginatedResponseDTO<ItemResponseDTO>> getAllMenus(@PathVariable("id") Long id,
                                                                        @Parameter(hidden = true) Pageable pageable);
 
-    @Operation(summary = "Buscar cardápio por ID",
-            description = "Retorna os dados de um cardápio específico.")
+    @Operation(summary = "Buscar item por ID",
+            description = "Retorna os dados de um item específico.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cardápio encontrado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Cardápio não encontrado")
+            @ApiResponse(responseCode = "200", description = "item encontrado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "item não encontrado")
     })
     ResponseEntity<ItemResponseDTO> findById(@PathVariable Long id);
 }
