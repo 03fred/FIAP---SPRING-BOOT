@@ -1,88 +1,53 @@
 package br.com.fiap.interfaces.swagger;
 
-import java.util.Map;
+import java.util.List;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import br.com.fiap.dto.ItemMenuDTO;
+import br.com.fiap.dto.MenuCreateDTO;
 import br.com.fiap.dto.MenuDTO;
 import br.com.fiap.dto.MenuResponseDTO;
-import br.com.fiap.dto.PaginatedResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
-@Tag(name = "Cardápio")
+@Tag(name = "Menu")
 public interface MenuApi {
 
-    @Operation(summary = "Cadastrar cardápio (ADMIN)",
-            description = "Permite que o administrador cadastre um cardápio em qualquer restaurante.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Cardápio cadastrado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados de entrada inválidos")
-    })
-    ResponseEntity<Void> saveByAdmin(@Valid @RequestBody MenuDTO menuDTO,
-                                     @PathVariable("restaurantId") Long restaurantId);
+	@Operation(summary = "Criar novo menu", description = "Cria um novo menu vinculado ao restaurante do dono autenticado.")
+	@ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Menu criado com sucesso"),
+			@ApiResponse(responseCode = "400", description = "Dados inválidos") })
+	ResponseEntity<MenuDTO> create(@Valid @RequestBody MenuCreateDTO dto);
 
-    @Operation(summary = "Cadastrar cardápio (REST. OWNER)",
-            description = "Permite ao dono do restaurante cadastrar cardápios para seu próprio restaurante.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Cardápio cadastrado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados de entrada inválidos")
-    })
-    ResponseEntity<Void> saveByOwner(@Valid @RequestBody MenuDTO menuDTO);
+	@Operation(summary = "Listar todos os menus", description = "Retorna a lista de menus disponíveis no sistema.")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Menus retornados com sucesso"),
+			@ApiResponse(responseCode = "500", description = "Erro interno") })
+	ResponseEntity<List<MenuResponseDTO>> findAll();
 
-    @Operation(summary = "Atualizar cardápio",
-            description = "Atualiza um cardápio existente com base no ID fornecido.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Cardápio atualizado com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "404", description = "Cardápio não encontrado")
-    })
-    ResponseEntity<Map<String, String>> update(@PathVariable("id") Long id,
-                                               @Valid @RequestBody MenuDTO menuDTO);
+	@Operation(summary = "Buscar menu por ID", description = "Retorna os detalhes de um menu específico.")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Menu encontrado"),
+			@ApiResponse(responseCode = "404", description = "Menu não encontrado") })
+	ResponseEntity<MenuResponseDTO> findById(@PathVariable Long id);
 
-    @Operation(summary = "Excluir cardápio",
-            description = "Exclui um cardápio com base no ID fornecido.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Cardápio excluído com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Cardápio não encontrado")
-    })
-    ResponseEntity<Void> delete(@PathVariable("id") Long id);
+	@Operation(summary = "Atualizar menu", description = "Atualiza as informações de um menu já existente.")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Menu atualizado com sucesso"),
+			@ApiResponse(responseCode = "400", description = "Dados inválidos"),
+			@ApiResponse(responseCode = "404", description = "Menu não encontrado") })
+	ResponseEntity<MenuDTO> update(@PathVariable Long id, @Valid @RequestBody MenuCreateDTO dto);
 
-    @Operation(summary = "Listar todos os cardápios do sistema (ADMIN)",
-            description = "Lista todos os cardápios cadastrados no sistema.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cardápios listados com sucesso"),
-            @ApiResponse(responseCode = "500", description = "Erro ao listar cardápios")
-    })
-    @Parameter(in = ParameterIn.QUERY, name = "page", description = "Página atual", schema = @Schema(type = "integer", defaultValue = "0"))
-    @Parameter(in = ParameterIn.QUERY, name = "size", description = "Itens por página", schema = @Schema(type = "integer", defaultValue = "10"))
-    @Parameter(in = ParameterIn.QUERY, name = "sort", description = "Ordenação", array = @ArraySchema(schema = @Schema(type = "string", example = "name,asc")))
-    ResponseEntity<PaginatedResponseDTO<MenuResponseDTO>> getAllMenus(@Parameter(hidden = true) Pageable pageable);
+	@Operation(summary = "Deletar menu", description = "Remove um menu com base no ID informado.")
+	@ApiResponses(value = { @ApiResponse(responseCode = "204", description = "Menu removido com sucesso"),
+			@ApiResponse(responseCode = "404", description = "Menu não encontrado") })
+	ResponseEntity<Void> delete(@PathVariable Long id);
 
-    @Operation(summary = "Listar cardápios por restaurante (USER)",
-            description = "Lista os cardápios de um restaurante específico.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cardápios listados com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Restaurante não encontrado")
-    })
-    ResponseEntity<PaginatedResponseDTO<MenuResponseDTO>> getAllMenus(@PathVariable("id") Long id,
-                                                                       @Parameter(hidden = true) Pageable pageable);
-
-    @Operation(summary = "Buscar cardápio por ID",
-            description = "Retorna os dados de um cardápio específico.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cardápio encontrado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Cardápio não encontrado")
-    })
-    ResponseEntity<MenuResponseDTO> findById(@PathVariable Long id);
+	@Operation(summary = "Adicionar item ao menu", description = "Adiciona um item existente a um menu existente, desde que pertençam ao mesmo restaurante.")
+	@ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Item adicionado ao menu com sucesso"),
+			@ApiResponse(responseCode = "400", description = "Dados inválidos"),
+			@ApiResponse(responseCode = "403", description = "Acesso não autorizado") })
+	ResponseEntity<Void> addItensMenu(@Valid @RequestBody ItemMenuDTO dto);
 }

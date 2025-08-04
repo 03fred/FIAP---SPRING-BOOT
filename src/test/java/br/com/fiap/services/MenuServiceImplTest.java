@@ -1,218 +1,200 @@
 package br.com.fiap.services;
 
-import br.com.fiap.dto.MenuDTO;
-import br.com.fiap.dto.MenuResponseDTO;
-import br.com.fiap.dto.PaginatedResponseDTO;
-import br.com.fiap.exceptions.ResourceNotFoundException;
-import br.com.fiap.factory.MenuFactory;
-import br.com.fiap.interfaces.repositories.MenuRepository;
-import br.com.fiap.interfaces.services.RestaurantService;
-import br.com.fiap.model.AuthenticatedUser;
-import br.com.fiap.model.Menu;
-import br.com.fiap.model.Restaurant;
-import br.com.fiap.model.Role;
-import br.com.fiap.model.enums.EnumUserType;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static br.com.fiap.factory.MenuFactory.createMenu;
-import static br.com.fiap.factory.MenuFactory.createMenuDTO;
-import static br.com.fiap.factory.RestaurantFactory.createRestaurant;
-import static br.com.fiap.factory.RestaurantFactory.createRestaurantDTO;
-import static br.com.fiap.factory.UserFactory.createUserMock;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
+import br.com.fiap.dto.ItemMenuDTO;
+import br.com.fiap.dto.MenuCreateDTO;
+import br.com.fiap.dto.MenuDTO;
+import br.com.fiap.dto.MenuResponseDTO;
+import br.com.fiap.exceptions.ResourceNotFoundException;
+import br.com.fiap.exceptions.UnauthorizedException;
+import br.com.fiap.interfaces.repositories.ItemRepository;
+import br.com.fiap.interfaces.repositories.MenuRepository;
+import br.com.fiap.interfaces.repositories.RestaurantRepository;
+import br.com.fiap.model.AuthenticatedUser;
+import br.com.fiap.model.Item;
+import br.com.fiap.model.Menu;
+import br.com.fiap.model.Restaurant;
+import br.com.fiap.model.Role;
+import br.com.fiap.model.enums.EnumUserType;
 
-@ExtendWith(MockitoExtension.class)
 class MenuServiceImplTest {
 
-    @Mock
-    private MenuRepository menuRepository;
+	@InjectMocks
+	private MenuServiceImpl menuService;
 
-    @Mock
-    private RestaurantService restaurantService;
+	@Mock
+	private MenuRepository menuRepository;
 
-    @InjectMocks
-    private MenuServiceImpl menuServiceImpl;
-    
+	@Mock
+	private ItemRepository itemRepository;
 
-    private AutoCloseable openMocks;
-    
-    @BeforeEach
-    void setUp() {
-        openMocks = MockitoAnnotations.openMocks(this);
-        setupSecurityContext("testuser", "ADMIN"); 
-    }
-    
-    private void setupSecurityContext(String username, String role) {
-    	Set<Role> userTypesRoles = new HashSet<>(); 
-    	userTypesRoles.add(new Role(EnumUserType.ADMIN.toString()));
- 
-    	AuthenticatedUser authenticatedUser = new AuthenticatedUser(1L, username, role, 1L, userTypesRoles);
-    	
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-        		authenticatedUser, null, authenticatedUser.getAuthorities());
+	@Mock
+	private RestaurantRepository restaurantRepository;
 
-        
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-    }
-    @Test
-    public void shouldSaveMenuWithOwnerId() {
-  
-        Menu menu = createMenu(1L);
-        MenuDTO menuDTO = createMenuDTO();
-        when(restaurantService.getRestaurant(menu.getId())).thenReturn(createRestaurant());
+	@Mock
+	private SecurityContext securityContext;
 
-        menuServiceImpl.save(menuDTO, menu.getId());
+	@Mock
+	private Authentication authentication;
 
-        verify(menuRepository, times(1)).save(any(Menu.class));
-    }
-
-    @Test
-    public void shouldReturnMenuById() {
-        Menu menu = createMenu(1L);
-        when(menuRepository.findById(1L)).thenReturn(Optional.of(menu));
-
-        MenuResponseDTO result = menuServiceImpl.getMenuById(1L);
-
-        assertEquals(menu.getName(), result.name());
-        assertEquals(menu.getDescription(), result.description());
-        assertEquals(menu.getAvailability(), result.availability());
-        assertEquals(menu.getPrice(), result.price());
-        assertEquals(menu.getPhoto(), result.photo());
-    }
-
-    @Test
-    public void shouldThrowWhenMenuNotFoundById() {
-        when(menuRepository.findById(1L)).thenReturn(Optional.empty());
-
-        assertThrows(ResourceNotFoundException.class, () -> menuServiceImpl.getMenuById(1L));
-    }
-
-    @Test
-    public void shouldUpdateMenu() {
-        Menu menu = createMenu(1L);
-        MenuDTO menuDTO = createMenuDTO();
-
-        when(menuRepository.findById(1L)).thenReturn(Optional.of(menu));
-
-        menuServiceImpl.update(menuDTO, 1L);
-
-        verify(menuRepository, times(1)).save(menu);
-        assertEquals(menuDTO.name(), menu.getName());
-        assertEquals(menuDTO.description(), menu.getDescription());
-        assertEquals(menuDTO.availability(), menu.getAvailability());
-        assertEquals(menuDTO.price(), menu.getPrice());
-        assertEquals(menuDTO.photo(), menu.getPhoto());
-    }
-
-    @Test
-    public void shouldThrowWhenUpdatingNonexistentMenu() {
-        MenuDTO menuDTO = createMenuDTO();
-        when(menuRepository.findById(1L)).thenReturn(Optional.empty());
-
-        assertThrows(ResourceNotFoundException.class, () -> menuServiceImpl.update(menuDTO, 1L));
-    }
-
-    @Test
-    public void shouldDeleteMenu() {
-        Menu menu = createMenu(1L);
-        when(menuRepository.findById(1L)).thenReturn(Optional.of(menu));
-
-        menuServiceImpl.delete(1L);
-
-        verify(menuRepository, times(1)).delete(menu);
-    }
-
-    @Test
-    public void shouldThrowWhenDeletingNonexistentMenu() {
-        when(menuRepository.findById(1L)).thenReturn(Optional.empty());
-
-        assertThrows(ResourceNotFoundException.class, () -> menuServiceImpl.delete(1L));
-    }
-
-    @Test
-    public void shouldListAllMenus() {
-    	
-        Long authenticatedRestaurantId = 1L;
-
-        Menu menu = createMenu(1L);
-
-        Restaurant restaurant = new Restaurant();
-        restaurant.setId(1l);
-        
-        menu.setRestaurant(restaurant);
-
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<Menu> menuPage = new PageImpl<>(List.of(menu));
-        when(menuRepository.findAllByRestaurantId(authenticatedRestaurantId, pageable)).thenReturn(menuPage);
+	private AutoCloseable openMocks;
 
 
-        PaginatedResponseDTO<MenuResponseDTO> response = menuServiceImpl.getAllMenu(pageable); // Era menuServiceImpl
+	@BeforeEach
+	void setUp() {
+		openMocks = MockitoAnnotations.openMocks(this);
+		setupSecurityContext("testuser", EnumUserType.ADMIN.toString(), 1L);
+	}
 
-        assertNotNull(response);
-        assertEquals(1, response.getTotalElements());
-        assertEquals(1, response.getContent().size());
-        assertEquals(menu.getName(), response.getContent().get(0).name());
+	private void setupSecurityContext(String username, String role, Long restaurantId) {
+		Set<Role> userTypesRoles = new HashSet<>();
+		userTypesRoles.add(new Role(role));
 
-        verify(menuRepository).findAllByRestaurantId(authenticatedRestaurantId, pageable);
-    }
+		AuthenticatedUser authenticatedUser = new AuthenticatedUser(1L, username, role, restaurantId, userTypesRoles);
 
-    @Test
-    void testAllArgsConstructorAndGetters() {
-        Restaurant restaurant = new Restaurant();
-        restaurant.setId(1L);
-        restaurant.setName("Restaurante X");
+		Authentication authentication = new UsernamePasswordAuthenticationToken(authenticatedUser, null,
+				authenticatedUser.getAuthorities());
 
-        Menu menu = new Menu(MenuFactory.createMenuDTO(), restaurant);
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+	}
+	
+	@Test
+	void shouldCreateMenu() {
+		MenuCreateDTO dto = new MenuCreateDTO("Menu Test", 1L);
+		Restaurant restaurant = new Restaurant();
+		restaurant.setId(1L);
 
-        assertEquals("Hamburguer", menu.getName());
-        assertEquals(restaurant, menu.getRestaurant());
-    }
+		when(restaurantRepository.findById(1L)).thenReturn(Optional.of(restaurant));
+		when(menuRepository.save(any(Menu.class))).thenAnswer(invocation -> {
+			Menu m = invocation.getArgument(0);
+			m.setId(1L);
+			return m;
+		});
 
-    @Test
-    void testEqualsAndHashCode() {
-        Restaurant restaurant = createRestaurant();
+		MenuDTO result = menuService.create(dto);
 
-        Menu menu1 = new Menu(MenuFactory.createMenuDTO(), restaurant);
-        Menu menu2 = new Menu(MenuFactory.createMenuDTO(), restaurant);
+		assertEquals("Menu Test", result.title());
+		assertEquals(1L, result.restaurantId());
+		verify(menuRepository, times(1)).save(any(Menu.class));
+	}
 
-        assertEquals(menu1, menu2);
-        assertEquals(menu1.hashCode(), menu2.hashCode());
-    }
+	@Test
+	void shouldFindAllMenus() {
+		Menu menu = new Menu();
+		menu.setId(1L);
+		menu.setTitle("Lunch");
+		Restaurant restaurant = new Restaurant();
+		restaurant.setId(1L);
+		menu.setRestaurant(restaurant);
+		
+		when(menuRepository.findAll()).thenReturn(List.of(menu));
 
-    @Test
-    void testToString() {
-        Restaurant restaurant = new Restaurant(createRestaurantDTO(), createUserMock());
+		List<MenuResponseDTO> all = menuService.findAll();
 
-        Menu menu = new Menu(MenuFactory.createMenuDTO(), restaurant);
+		assertEquals(1, all.size());
+		assertEquals("Lunch", all.get(0).title());
+	}
 
-        assertTrue(menu.toString().contains("Menu"));
-        assertTrue(menu.toString().contains("Lanche"));
-    }
+	@Test
+	void shouldThrowWhenMenuNotFound() {
+		when(menuRepository.findById(999L)).thenReturn(Optional.empty());
+		assertThrows(ResourceNotFoundException.class, () -> menuService.findById(999L));
+	}
 
+	@Test
+	void shouldUpdateMenu() {
+		MenuCreateDTO dto = new MenuCreateDTO("New Title", 1L);
+
+		Restaurant restaurant = new Restaurant();
+		restaurant.setId(1L);
+
+		Menu menu = new Menu();
+		menu.setId(1L);
+		menu.setRestaurant(restaurant);
+
+		when(menuRepository.findById(1L)).thenReturn(Optional.of(menu));
+		when(restaurantRepository.findById(1L)).thenReturn(Optional.of(restaurant));
+		when(menuRepository.save(any(Menu.class))).thenAnswer(i -> i.getArgument(0));
+
+		MenuDTO updated = menuService.update(1L, dto);
+
+		assertEquals("New Title", updated.title());
+	}
+
+	@Test
+	void shouldDeleteMenu() {
+		Restaurant restaurant = new Restaurant();
+		restaurant.setId(1L);
+
+		Menu menu = new Menu();
+		menu.setId(1L);
+		menu.setRestaurant(restaurant);
+
+		when(menuRepository.findById(1L)).thenReturn(Optional.of(menu));
+
+		assertDoesNotThrow(() -> menuService.delete(1L));
+		verify(menuRepository).delete(menu);
+	}
+
+	@Test
+	void shouldThrowWhenUnauthorizedOnDelete() {
+		setupSecurityContext("testuser_restaurantowner", EnumUserType.RESTAURANT_OWNER.toString(), 1L);
+		
+		Restaurant restaurant = new Restaurant();
+		restaurant.setId(2L); // Not same as user's restaurantId
+
+		Menu menu = new Menu();
+		menu.setId(1L);
+		menu.setRestaurant(restaurant);
+
+		when(menuRepository.findById(1L)).thenReturn(Optional.of(menu));
+
+		assertThrows(UnauthorizedException.class, () -> menuService.delete(1L));
+	}
+
+	@Test
+	void shouldAddItemToMenu() {
+		Restaurant restaurant = new Restaurant();
+		restaurant.setId(1L);
+
+		Menu menu = new Menu();
+		menu.setId(1L);
+		menu.setRestaurant(restaurant);
+
+
+		Item item = new Item();
+		item.setId(1L);
+		item.setRestaurant(restaurant);
+
+		ItemMenuDTO dto = new ItemMenuDTO(1L, 1L);
+
+		when(menuRepository.findById(1L)).thenReturn(Optional.of(menu));
+		when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
+
+		assertDoesNotThrow(() -> menuService.addItemToMenu(dto));
+		assertEquals(1, menu.getItems().size());
+		verify(menuRepository).save(menu);
+	}
 }

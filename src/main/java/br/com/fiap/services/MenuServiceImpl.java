@@ -1,139 +1,160 @@
 package br.com.fiap.services;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import br.com.fiap.dto.ItemDTO;
+import br.com.fiap.dto.ItemMenuDTO;
+import br.com.fiap.dto.MenuCreateDTO;
 import br.com.fiap.dto.MenuDTO;
 import br.com.fiap.dto.MenuResponseDTO;
-import br.com.fiap.dto.PaginatedResponseDTO;
-import br.com.fiap.exceptions.BusinessException;
 import br.com.fiap.exceptions.ResourceNotFoundException;
 import br.com.fiap.exceptions.UnauthorizedException;
+import br.com.fiap.interfaces.repositories.ItemRepository;
 import br.com.fiap.interfaces.repositories.MenuRepository;
+import br.com.fiap.interfaces.repositories.RestaurantRepository;
 import br.com.fiap.interfaces.services.MenuService;
-import br.com.fiap.interfaces.services.RestaurantService;
 import br.com.fiap.model.AuthenticatedUser;
+import br.com.fiap.model.Item;
 import br.com.fiap.model.Menu;
 import br.com.fiap.model.Restaurant;
 
 @Service
-public class MenuServiceImpl implements MenuService {
+public class MenuServiceImpl implements MenuService{
 
-	@Autowired
-	private MenuRepository menuRepository;
+    @Autowired
+    private MenuRepository menuRepository;
+    
+    @Autowired
+    private ItemRepository itemRepository;
 
-	@Autowired
-	private RestaurantService restaurantService;
-
+    @Autowired
+    private RestaurantRepository restaurantRepository;
 
 	@Override
-	public void save(MenuDTO menuDTO, Long restaurantId) {
-		Restaurant restaurant = restaurantService.getRestaurant(restaurantId);
-		this.save(restaurant, menuDTO);
-	}
+	public MenuDTO create(MenuCreateDTO dto) {
+	    
+    	Long restaurantId = getRestaurantId(dto.restaurantId());
 	
-	@Override
-	public void save(MenuDTO menuDTO) {
-		AuthenticatedUser userAuth = (AuthenticatedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if(Objects.isNull(userAuth.getRestaurantId())){
-			throw new BusinessException("Restaurante não existe no token de acesso. Favor renove suas credenciais e tente novamente.");
-		}
-		
-		Restaurant restaurant = restaurantService.getRestaurant(userAuth.getRestaurantId());
-		this.save(restaurant, menuDTO);
-	}
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+            .orElseThrow(() -> new ResourceNotFoundException("Restaurante não encontrado"));
 
-	private void save(Restaurant restaurant, MenuDTO menuDTO) {
-		if (restaurant != null) {
-			Menu menu = new Menu(menuDTO, restaurant);
-			menuRepository.save(menu);
-		}
-	}
-	
-	@Override
-	public MenuResponseDTO getMenuById(Long id) {
-		var menu = menuRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Cardápio não encontrado com o id: " + id));
+        Menu menu = new Menu();
+        menu.setTitle(dto.title());
+        menu.setRestaurant(restaurant);
 
-		return new MenuResponseDTO(
-				menu.getName(),
-				menu.getDescription(),
-				menu.getAvailability(),
-				menu.getPrice(),
-				menu.getPhoto()
-		);
-	}
+        Menu saved = menuRepository.save(menu);
+        return new MenuDTO(saved.getId(), saved.getTitle(), saved.getRestaurant().getId());
+    }
 
-	@Override
-	public void update(MenuDTO menuDTO, Long id) {
-		
-		Menu menu = menuRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Cardápio não encontrado com o id: " + id));
+    @Override
+    public List<MenuResponseDTO> findAll() {
+        return menuRepository.findAll().stream()
+            .map(menu -> new MenuResponseDTO(menu.getId(), menu.getTitle(), menu.getRestaurant().getId(), getItens(menu)))
+            .toList();
+    }
 
-		 checkPermissionMenuUpdateDelete(menu);
-		
-		menu.setName(menuDTO.name());
-		menu.setDescription(menuDTO.description());
-		menu.setAvailability(menuDTO.availability());
-		menu.setPrice(menuDTO.price());
-		menu.setPhoto(menuDTO.photo());
+    private ItemDTO mapToItemDTO(Item item) {
+        return new ItemDTO(
+            item.getName(),
+            item.getDescription(),
+            item.getPrice(),
+            item.getAvailability(),
+            item.getPhoto()
+        );
+    }
+    private List<ItemDTO>  getItens(Menu menu) {
+    	  return menu.getItems().stream()
+    		        .map(this::mapToItemDTO)
+    		        .toList();
+    }
+    
+    @Override
+    public MenuResponseDTO findById(Long id) {
+        Menu menu = menuRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Menu not found"));
+        return new MenuResponseDTO(menu.getId(), menu.getTitle(), menu.getRestaurant().getId(), getItens(menu));
+    }
 
-		menuRepository.save(menu);
-	}
-	
-	private void checkPermissionMenuUpdateDelete(Menu menu) {
-		AuthenticatedUser userAuth = (AuthenticatedUser) SecurityContextHolder.getContext().getAuthentication()
-				.getPrincipal();
-		
-		if (!userAuth.hasRoleAdmin() && !menu.getRestaurant().getRestaurantOwner().getId().equals(userAuth.getId())) {
+    @Override
+    public MenuDTO update(Long id, MenuCreateDTO dto) {
+
+        Menu menu = menuRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Menu não encontrado"));
+
+        Long restaurantId = getRestaurantId(menu.getRestaurant().getId());
+        
+        if(!restaurantId.equals(menu.getRestaurant().getId())) {
+			throw new UnauthorizedException("Esse menu não pertence ao usuário logado.");
+        }
+
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+            .orElseThrow(() -> new ResourceNotFoundException("Restaurante não encontrado"));
+
+        menu.setTitle(dto.title());
+        menu.setRestaurant(restaurant);
+
+        Menu updated = menuRepository.save(menu);
+        return new MenuDTO(updated.getId(), updated.getTitle(), updated.getRestaurant().getId());
+    }
+
+    @Override
+    public void delete(Long id) {
+        Menu menu = menuRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Menu not found"));
+        
+        Long restaurantId = getRestaurantId(menu.getRestaurant().getId());
+        
+        if(!restaurantId.equals(menu.getRestaurant().getId())) {
+			throw new UnauthorizedException("Esse menu não pertence ao usuário logado.");
+        }
+        
+        menuRepository.delete(menu);
+    }
+    
+    private Long getRestaurantId(Long id) {
+    	AuthenticatedUser auth = (AuthenticatedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	    return auth.hasRoleAdmin() ? id : auth.getRestaurantId();
+    }
+    
+    public void addItemToMenu(ItemMenuDTO dto) {
+    	
+		Menu menu = menuRepository.findById(dto.menuId())
+				.orElseThrow(() -> new ResourceNotFoundException("Menu não encontrado"));
+
+		Item item = itemRepository.findById(dto.itemId())
+				.orElseThrow(() -> new ResourceNotFoundException("Item não encontrado"));
+
+		Long restaurantId = getRestaurantId(menu.getRestaurant().getId());
+
+		if (!restaurantId.equals(menu.getRestaurant().getId())) {
 			throw new UnauthorizedException("Esse menu não pertence ao usuário logado.");
 		}
-	}
-
-	@Override
-	public void delete(Long id) {
-		Menu menu = menuRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Cardápio não encontrado com o id: " + id + "."));
-
-		checkPermissionMenuUpdateDelete(menu);
 		
-		menuRepository.delete(menu);
+		menu.getItems().add(item);
+		menuRepository.save(menu);
 	}
+    
+    public void removeItemFromMenu(ItemMenuDTO dto) {
 
-	@Override
-	public PaginatedResponseDTO<MenuResponseDTO> getAllMenu(Pageable pageable) {
-		AuthenticatedUser userAuth = (AuthenticatedUser) SecurityContextHolder.getContext().getAuthentication()
-				.getPrincipal();
-		Page<Menu> menuPage = menuRepository.findAllByRestaurantId(userAuth.getRestaurantId(), pageable);
+        Menu menu = menuRepository.findById(dto.menuId())
+                .orElseThrow(() -> new ResourceNotFoundException("Menu não encontrado"));
 
-		return getPage(menuPage);
-	}
-	
-	@Override
-	public PaginatedResponseDTO<MenuResponseDTO> getAllMenu(Pageable pageable, Long restaurantId) {
-		Page<Menu> menuPage = menuRepository.findAll(pageable);
-		return getPage(menuPage);
-	}
+        Item item = itemRepository.findById(dto.itemId())
+                .orElseThrow(() -> new ResourceNotFoundException("Item não encontrado"));
 
-	private PaginatedResponseDTO<MenuResponseDTO> getPage(Page<Menu> menuPage) {
-		List<MenuResponseDTO> menuResponseDTOS = menuPage.getContent().stream()
-				.map(menu -> new MenuResponseDTO(menu.getName(), menu.getDescription(), menu.getAvailability(),
-						menu.getPrice(), menu.getPhoto()))
-				.collect(Collectors.toList());
+        Long restaurantId = getRestaurantId(menu.getRestaurant().getId());
 
-		return new PaginatedResponseDTO<>(
-				menuResponseDTOS,
-				menuPage.getTotalElements(),
-				menuPage.getNumber(),
-				menuPage.getSize()
-		);
-	}
+        if (!restaurantId.equals(menu.getRestaurant().getId())) {
+            throw new UnauthorizedException("Esse menu não pertence ao usuário logado.");
+        }
+       
+        menu.getItems().remove(item);
+        menuRepository.save(menu);
+    }
+
 
 }

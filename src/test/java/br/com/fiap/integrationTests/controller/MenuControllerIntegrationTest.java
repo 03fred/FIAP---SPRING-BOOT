@@ -1,18 +1,20 @@
 package br.com.fiap.integrationTests.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,12 +30,18 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.fiap.config.security.JwtTokenUtil;
+import br.com.fiap.dto.ItemDTO;
+import br.com.fiap.dto.ItemMenuDTO;
+import br.com.fiap.dto.MenuCreateDTO;
 import br.com.fiap.dto.MenuDTO;
-import br.com.fiap.interfaces.repositories.MenuRepository;
+import br.com.fiap.dto.MenuResponseDTO;
+import br.com.fiap.factory.AddressFactory;
+import br.com.fiap.interfaces.repositories.ItemRepository;
 import br.com.fiap.interfaces.repositories.RestaurantRepository;
 import br.com.fiap.interfaces.repositories.RoleRepository;
 import br.com.fiap.interfaces.repositories.UserRepository;
-import br.com.fiap.model.Menu;
+import br.com.fiap.interfaces.services.MenuService;
+import br.com.fiap.model.Item;
 import br.com.fiap.model.Restaurant;
 import br.com.fiap.model.Role;
 import br.com.fiap.model.User;
@@ -44,19 +52,27 @@ import jakarta.transaction.Transactional;
 @TestPropertySource(properties = { "spring.jpa.hibernate.ddl-auto=create-drop" })
 @ActiveProfiles("test")
 @Transactional
-public class MenuControllerIntegrationTest {
+class MenuControllerIntegrationTest {
 
 	@Autowired
 	private MockMvc mockMvc;
 
+	@MockBean
+	private MenuService menuService;
+
 	@Autowired
 	private ObjectMapper objectMapper;
+
+	private MenuCreateDTO menuCreateDTO;
+	private MenuDTO menuDTO;
+	private MenuResponseDTO menuResponseDTO;
+	private ItemMenuDTO itemMenuDTO;
 
 	@Autowired
 	private RestaurantRepository restaurantRepository;
 
 	@Autowired
-	private MenuRepository menuRepository;
+	private ItemRepository itemRepository;
 
 	@Autowired
 	private UserRepository userRepository;
@@ -64,11 +80,11 @@ public class MenuControllerIntegrationTest {
 	@Autowired
 	private RoleRepository roleRepository;
 
-	@Autowired
-	private PasswordEncoder passwordEncoder;
-
 	@MockBean
 	private JavaMailSender mailSender;
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	private String jwtAdmin;
 
@@ -76,13 +92,15 @@ public class MenuControllerIntegrationTest {
 
 	private Long restaurantId;
 
-	Menu menu;
+	Item item;
 
-	private MenuDTO menuDTO;
+	private ItemDTO itemDTO;
 
+	private User owner = new User();
+	
 	@BeforeEach
 	void setup() {
-		menuRepository.deleteAll();
+		itemRepository.deleteAll();
 		restaurantRepository.deleteAll();
 		userRepository.deleteAll();
 		roleRepository.deleteAll();
@@ -102,17 +120,16 @@ public class MenuControllerIntegrationTest {
 		admin.setEmail("admin@admin.com");
 		admin.setPassword(passwordEncoder.encode("admin123"));
 		admin.setName("Admin");
-		admin.setAddress("Admin Address");
+		admin.setAddress(AddressFactory.getMockAddress(admin));
 		admin.getUserTypesRoles().add(adminRole);
 		userRepository.save(admin);
 
-		// Cria usuário OWNER
-		User owner = new User();
+	
 		owner.setLogin("owner_" + UUID.randomUUID());
 		owner.setEmail("owner@owner.com");
 		owner.setPassword(passwordEncoder.encode("owner123"));
 		owner.setName("Owner");
-		owner.setAddress("Owner Address");
+		owner.setAddress(AddressFactory.getMockAddress(owner));
 		owner.getUserTypesRoles().add(ownerRole);
 		owner = userRepository.save(owner);
 
@@ -130,79 +147,125 @@ public class MenuControllerIntegrationTest {
 
 		jwtOwner = JwtTokenUtil.createToken(owner.getLogin(), restaurantId);
 
-		menuDTO = new MenuDTO("Pizza Margherita", "Tradicional com molho de tomate e manjericão", "39.90", "true",
-				"https://exemplo.com/imagem/pizza.jpg");
+		itemDTO = new ItemDTO("Pizza Margherita", "Tradicional com molho de tomate e manjericão",
+				new BigDecimal("39.90"), true, "https://exemplo.com/imagem/pizza.jpg");
 
-		menu = new Menu(menuDTO, restaurant);
-		menu = menuRepository.save(menu); // agora temos o ID real
+		item = new Item(itemDTO, restaurant);
+		item = itemRepository.save(item);
+
+		menuDTO = new MenuDTO(restaurantId, "restauranteOwner", restaurantId);
+		menuCreateDTO = new MenuCreateDTO("menu de terça", restaurantId);
 	}
 
 	@Test
-	@WithMockUser(username = "admin", roles = { "ADMIN" }) // Explicit username and roles
-	@Transactional
-	void givenValidMenuDTO_whenAdminCreatesMenu_thenReturnCreated() throws Exception {
-		mockMvc.perform(post("/menu/restaurant/" + restaurantId).header("Authorization", "Bearer " + jwtAdmin)
-				.contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(menuDTO)))
-				.andExpect(status().isCreated());
+	@WithMockUser(roles = "RESTAURANT_OWNER")
+	void shouldCreateMenu() throws Exception {
+		Mockito.when(menuService.create(any())).thenReturn(menuDTO);
 
-		List<Menu> menus = menuRepository.findAll();
-		assertEquals(2, menus.size());
-		assertEquals("Pizza Margherita", menus.get(0).getName());
+		mockMvc.perform(post("/menus").contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(menuCreateDTO)).header("Authorization", "Bearer " + jwtOwner))
+				.andExpect(status().isCreated());
 	}
 
 	@Test
-	@WithMockUser(username = "admin", roles = { "ADMIN" }) // Explicit username and roles
-	@Transactional
-	void testSaveByAdmin() throws Exception {
-		mockMvc.perform(post("/menu/restaurant/" + restaurantId).contentType(MediaType.APPLICATION_JSON)
-				.header("Authorization", "Bearer " + jwtAdmin).content(objectMapper.writeValueAsString(menuDTO)))
+	@WithMockUser(roles = "RESTAURANT_OWNER")
+	void shouldCreateMenuItem() throws Exception {
+		Mockito.when(menuService.create(any())).thenReturn(menuDTO);
+		ItemMenuDTO itemMenuDTO = new ItemMenuDTO(item.getId(), menuDTO.id());
+
+		mockMvc.perform(post("/menus/item").contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(itemMenuDTO)).header("Authorization", "Bearer " + jwtOwner))
 				.andExpect(status().isCreated());
+	}
+
+	@Test
+	@WithMockUser(roles = "RESTAURANT_OWNER")
+	void shouldRemoveMenuItem() throws Exception {
+		Mockito.when(menuService.create(any())).thenReturn(menuDTO);
+		ItemMenuDTO itemMenuDTO = new ItemMenuDTO(item.getId(), menuDTO.id());
+		mockMvc.perform(delete("/menus/item")
+		        .content(objectMapper.writeValueAsString(itemMenuDTO))
+		        .contentType(MediaType.APPLICATION_JSON) 
+		        .header("Authorization", "Bearer " + jwtOwner))
+		    .andExpect(status().isNoContent());
+
 	}
 
 	@Test
 	@WithMockUser(username = "Owner", roles = { "RESTAURANT_OWNER" })
 	@Transactional
-	void testSaveByOwner() throws Exception {
-		mockMvc.perform(post("/menu/owner").contentType(MediaType.APPLICATION_JSON)
-				.header("Authorization", "Bearer " + jwtOwner).content(objectMapper.writeValueAsString(menuDTO)))
-				.andExpect(status().isCreated());
-	}
+	void testGetAllMenusOwner() throws Exception {
+		   MenuResponseDTO menu1 = new MenuResponseDTO(1L, "Menu 1", 1L, List.of());
+		    MenuResponseDTO menu2 = new MenuResponseDTO(2L, "Menu 2", 1L, List.of());
 
-	@Test
-	@WithMockUser(username = "Owner", roles = { "RESTAURANT_OWNER" })
-	@Transactional
-	void testUpdateMenu() throws Exception {
-		mockMvc.perform(put("/menu/update/" + menu.getId()).contentType(MediaType.APPLICATION_JSON)
-				.header("Authorization", "Bearer " + jwtOwner).content(objectMapper.writeValueAsString(menuDTO)))
-				.andExpect(status().isNoContent());
-	}
+		    List<MenuResponseDTO> menus = List.of(menu1, menu2);
 
+		    Mockito.when(menuService.findAll()).thenReturn(menus);
+		    
+		 mockMvc.perform(get("/menus")
+		            .header("Authorization", "Bearer " + jwtOwner))
+		        .andExpect(status().isOk())
+		        .andExpect(jsonPath("$.length()").value(2))
+		        .andExpect(jsonPath("$[0].restaurantId").value(1L));
+		 }
+	
+	
 	@Test
 	@WithMockUser(username = "admin", roles = { "ADMIN" })
 	@Transactional
-	void testDeleteMenu() throws Exception {
-		mockMvc.perform(delete("/menu/" + menu.getId()).header("Authorization", "Bearer " + jwtAdmin))
-				.andExpect(status().isNoContent());
+	void testGetAllMenusByAdmin() throws Exception {
+		mockMvc.perform(get("/menus").header("Authorization", "Bearer " + jwtAdmin)).andExpect(status().isOk());
+	}
+	
+	@Test
+	@WithMockUser(roles = "RESTAURANT_OWNER")
+	void shouldReturnBadRequestWhenCreatingInvalidMenu() throws Exception {
+	    MenuCreateDTO invalidMenu = new MenuCreateDTO("", restaurantId);
+
+	    mockMvc.perform(post("/menus")
+	            .contentType(MediaType.APPLICATION_JSON)
+	            .content(objectMapper.writeValueAsString(invalidMenu))
+	            .header("Authorization", "Bearer " + jwtOwner))
+	        .andExpect(status().isBadRequest());
+	}
+
+	
+	@Test
+	@WithMockUser(roles = "RESTAURANT_OWNER")
+	void shouldReturnNotFoundWhenRemovingNonexistentMenuItem() throws Exception {
+	    Mockito.doThrow(new br.com.fiap.exceptions.ResourceNotFoundException("Item not found"))
+	        .when(menuService).removeItemFromMenu(any());
+	    
+	    
+	    ItemMenuDTO itemMenuDTO = new ItemMenuDTO(10L, 10L);
+
+	    mockMvc.perform(delete("/menus/item")
+	            .contentType(MediaType.APPLICATION_JSON)
+	            .content(objectMapper.writeValueAsString(itemMenuDTO))
+	            .header("Authorization", "Bearer " + jwtOwner))
+	        .andExpect(status().isNotFound());
 	}
 
 	@Test
-	@WithMockUser(username = "Owner", roles = { "RESTAURANT_OWNER" })
-	@Transactional
-	void testGetAllMenusByRestaurantId() throws Exception {
-		mockMvc.perform(get("/menu/restaurant/" + restaurantId).header("Authorization", "Bearer " + jwtOwner)).andExpect(status().isOk());
+	@WithMockUser(roles = "RESTAURANT_OWNER")
+	void shouldReturnEmptyListWhenNoMenusExist() throws Exception {
+	    Mockito.when(menuService.findAll()).thenReturn(List.of());
+
+	    mockMvc.perform(get("/menus")
+	            .header("Authorization", "Bearer " + jwtOwner))
+	        .andExpect(status().isOk())
+	        .andExpect(jsonPath("$.length()").value(0));
+	}
+	
+	@Test
+	@WithMockUser(roles = "USER")
+	void shouldDenyAccessForUserRole() throws Exception {
+	    mockMvc.perform(post("/menus")
+	            .contentType(MediaType.APPLICATION_JSON)
+	            .content(objectMapper.writeValueAsString(menuCreateDTO)))
+	        .andExpect(status().isForbidden());
 	}
 
-	@Test
-	@WithMockUser(username = "Owner", roles = { "RESTAURANT_OWNER" })
-	@Transactional
-	void testGetAllMenusByOwner() throws Exception {
-		mockMvc.perform(get("/menu").header("Authorization", "Bearer " + jwtOwner)).andExpect(status().isOk());
-	}
 
-	@Test
-	@WithMockUser(username = "Owner", roles = { "RESTAURANT_OWNER" })
-	@Transactional
-	void testFindById() throws Exception {
-		mockMvc.perform(get("/menu/" + menu.getId()).header("Authorization", "Bearer " + jwtOwner)).andExpect(status().isOk());
-	}
+
 }

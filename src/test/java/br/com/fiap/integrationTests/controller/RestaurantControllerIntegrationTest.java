@@ -8,6 +8,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
+import br.com.fiap.factory.AddressFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,7 +87,7 @@ public class RestaurantControllerIntegrationTest {
         admin.setEmail("admin@test.com");
         admin.setPassword(passwordEncoder.encode("admin123"));
         admin.setName("Admin");
-        admin.setAddress("Admin Street");
+        admin.setAddress(AddressFactory.getMockAddress());
         admin.getUserTypesRoles().add(adminRole);
         userRepository.save(admin);
 
@@ -98,7 +99,7 @@ public class RestaurantControllerIntegrationTest {
         owner.setEmail("owner@test.com");
         owner.setPassword(passwordEncoder.encode("owner123"));
         owner.setName("Owner");
-        owner.setAddress("Owner Street");
+        owner.setAddress(AddressFactory.getMockAddress());
         owner.getUserTypesRoles().add(ownerRole);
         ownerId = userRepository.save(owner).getId();
     }
