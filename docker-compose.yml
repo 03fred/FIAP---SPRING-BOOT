@@ -27,6 +27,10 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: Senharoot@123
       SPRING_PROFILES_ACTIVE: prod
+
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+
     ports:
       - "8081:8080"
 
