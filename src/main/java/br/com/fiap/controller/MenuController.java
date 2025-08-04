@@ -58,7 +58,7 @@ public class MenuController implements MenuApi{
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         menuService.delete(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
     
     @PreAuthorize("hasRole('RESTAURANT_OWNER')")
@@ -66,5 +66,12 @@ public class MenuController implements MenuApi{
     public ResponseEntity<Void> addItensMenu( @RequestBody @Valid ItemMenuDTO dto) {
     	menuService.addItemToMenu(dto);
     	return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+    
+    @PreAuthorize("hasRole('RESTAURANT_OWNER')")
+    @DeleteMapping("/item")
+    public ResponseEntity<Void> removeItensMenu( @RequestBody @Valid ItemMenuDTO dto) {
+    	menuService.removeItemFromMenu(dto);
+    	return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

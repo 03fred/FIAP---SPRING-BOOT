@@ -1,6 +1,9 @@
 package br.com.fiap.model;
 
 import br.com.fiap.dto.AddressDTO;
+
+import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -10,7 +13,6 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode
 @ToString
 @Entity
 @Table(name = "addresses")
@@ -52,5 +54,25 @@ public class Address {
                 this.zipCode
         );
     }
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, state, zipCode);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Address other = (Address) obj;
+		return Objects.equals(id, other.id) && Objects.equals(state, other.state)
+				&& Objects.equals(zipCode, other.zipCode);
+	}
+    
+    
 
 }

@@ -16,10 +16,14 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
+import br.com.fiap.ErrorResponseDTO;
 import br.com.fiap.dto.HttpMessageNotReadableExceptionDTO;
 import br.com.fiap.dto.ResourceNotFoundDTO;
 import br.com.fiap.dto.ValidationErrorDTO;
+import br.com.fiap.exceptions.ConflictException;
 import br.com.fiap.exceptions.ResourceNotFoundException;
+import br.com.fiap.exceptions.UnauthorizedException;
+import jakarta.persistence.EntityNotFoundException;
 
 @ControllerAdvice
 public class ControllerExceptionHandler {
@@ -70,4 +74,24 @@ public class ControllerExceptionHandler {
 		body.put("error", HttpStatus.CONFLICT.getReasonPhrase());
 		return new ResponseEntity<>(body, HttpStatus.CONFLICT);
 	}
+	
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorResponseDTO> handleNotFound(EntityNotFoundException ex) {
+    	 var statusCode = HttpStatus.NOT_FOUND;
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDTO(ex.getMessage(), statusCode.value()));
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ErrorResponseDTO> handleConflictException(ConflictException ex) {
+        var statusCode = HttpStatus.CONFLICT;
+        return ResponseEntity.status(statusCode).body(new ErrorResponseDTO(ex.getMessage(), statusCode.value()));
+    }
+    
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ErrorResponseDTO> handleUnauthorized(UnauthorizedException ex) {
+        var statusCode = HttpStatus.FORBIDDEN;
+        return ResponseEntity.status(statusCode).body(new ErrorResponseDTO(ex.getMessage(), statusCode.value()));
+    }
+    
 }

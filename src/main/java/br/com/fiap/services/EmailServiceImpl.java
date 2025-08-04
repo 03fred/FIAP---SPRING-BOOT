@@ -15,9 +15,9 @@ public class EmailServiceImpl implements EmailService {
 
 	    public void sendResetToken(String toEmail, String token) {
 	        String subject = "Recuperação de Senha";
-	        String resetUrl = "http://localhost:8080/api/auth/reset-password?token=" + token;
+	        String resetUrl = "http://localhost:8081/api/auth/reset-password?token=" + token;
 	        String message = "Clique no link para redefinir sua senha: " + resetUrl;
-
+	        
 	        SimpleMailMessage email = new SimpleMailMessage();
 	        email.setTo(toEmail);
 	        email.setSubject(subject);

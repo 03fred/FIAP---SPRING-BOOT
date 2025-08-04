@@ -11,6 +11,7 @@ import br.com.fiap.dto.ItemMenuDTO;
 import br.com.fiap.dto.MenuCreateDTO;
 import br.com.fiap.dto.MenuDTO;
 import br.com.fiap.dto.MenuResponseDTO;
+import br.com.fiap.exceptions.ResourceNotFoundException;
 import br.com.fiap.exceptions.UnauthorizedException;
 import br.com.fiap.interfaces.repositories.ItemRepository;
 import br.com.fiap.interfaces.repositories.MenuRepository;
@@ -20,7 +21,6 @@ import br.com.fiap.model.AuthenticatedUser;
 import br.com.fiap.model.Item;
 import br.com.fiap.model.Menu;
 import br.com.fiap.model.Restaurant;
-import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class MenuServiceImpl implements MenuService{
@@ -40,7 +40,7 @@ public class MenuServiceImpl implements MenuService{
     	Long restaurantId = getRestaurantId(dto.restaurantId());
 	
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
-            .orElseThrow(() -> new EntityNotFoundException("Restaurante não encontrado"));
+            .orElseThrow(() -> new ResourceNotFoundException("Restaurante não encontrado"));
 
         Menu menu = new Menu();
         menu.setTitle(dto.title());
@@ -75,7 +75,7 @@ public class MenuServiceImpl implements MenuService{
     @Override
     public MenuResponseDTO findById(Long id) {
         Menu menu = menuRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Menu not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Menu not found"));
         return new MenuResponseDTO(menu.getId(), menu.getTitle(), menu.getRestaurant().getId(), getItens(menu));
     }
 
@@ -83,7 +83,7 @@ public class MenuServiceImpl implements MenuService{
     public MenuDTO update(Long id, MenuCreateDTO dto) {
 
         Menu menu = menuRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Menu não encontrado"));
+            .orElseThrow(() -> new ResourceNotFoundException("Menu não encontrado"));
 
         Long restaurantId = getRestaurantId(menu.getRestaurant().getId());
         
@@ -92,7 +92,7 @@ public class MenuServiceImpl implements MenuService{
         }
 
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
-            .orElseThrow(() -> new EntityNotFoundException("Restaurante não encontrado"));
+            .orElseThrow(() -> new ResourceNotFoundException("Restaurante não encontrado"));
 
         menu.setTitle(dto.title());
         menu.setRestaurant(restaurant);
@@ -104,7 +104,7 @@ public class MenuServiceImpl implements MenuService{
     @Override
     public void delete(Long id) {
         Menu menu = menuRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Menu not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Menu not found"));
         
         Long restaurantId = getRestaurantId(menu.getRestaurant().getId());
         
@@ -123,25 +123,38 @@ public class MenuServiceImpl implements MenuService{
     public void addItemToMenu(ItemMenuDTO dto) {
     	
 		Menu menu = menuRepository.findById(dto.menuId())
-				.orElseThrow(() -> new EntityNotFoundException("Menu não encontrado"));
+				.orElseThrow(() -> new ResourceNotFoundException("Menu não encontrado"));
 
 		Item item = itemRepository.findById(dto.itemId())
-				.orElseThrow(() -> new EntityNotFoundException("Item não encontrado"));
+				.orElseThrow(() -> new ResourceNotFoundException("Item não encontrado"));
 
 		Long restaurantId = getRestaurantId(menu.getRestaurant().getId());
 
 		if (!restaurantId.equals(menu.getRestaurant().getId())) {
 			throw new UnauthorizedException("Esse menu não pertence ao usuário logado.");
 		}
-
-		restaurantId = getRestaurantId(item.getRestaurant().getId());
-
-		if (!restaurantId.equals(menu.getRestaurant().getId())) {
-			throw new UnauthorizedException("Esse item não pertence ao usuário logado.");
-		}
-
+		
 		menu.getItems().add(item);
 		menuRepository.save(menu);
 	}
+    
+    public void removeItemFromMenu(ItemMenuDTO dto) {
+
+        Menu menu = menuRepository.findById(dto.menuId())
+                .orElseThrow(() -> new ResourceNotFoundException("Menu não encontrado"));
+
+        Item item = itemRepository.findById(dto.itemId())
+                .orElseThrow(() -> new ResourceNotFoundException("Item não encontrado"));
+
+        Long restaurantId = getRestaurantId(menu.getRestaurant().getId());
+
+        if (!restaurantId.equals(menu.getRestaurant().getId())) {
+            throw new UnauthorizedException("Esse menu não pertence ao usuário logado.");
+        }
+       
+        menu.getItems().remove(item);
+        menuRepository.save(menu);
+    }
+
 
 }
