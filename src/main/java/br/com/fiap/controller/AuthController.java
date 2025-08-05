@@ -1,7 +1,6 @@
 package br.com.fiap.controller;
 
 
-import java.util.Map;
 import java.util.Objects;
 
 // Removed Swagger imports from here
@@ -68,12 +67,13 @@ public class AuthController implements AuthApi {
 		restaurantService.findByIdAndRestaurantOwnerId(ownerId, restaurantId);
 	}
 	
+	@Override 
 	@PostMapping("/forgot-password")
     public ResponseEntity<String> forgotPassword(@Valid @RequestBody UserForgotPasswordDTO userAuth) {
         authService.requestPasswordReset(userAuth.identificator());
         return ResponseEntity.status(HttpStatus.CREATED).body("E-mail enviado com instruções para redefinição");
     }
-	
+	 @Override 
 	 @PostMapping("/reset-password")
 	    public ResponseEntity<String> resetPassword(@RequestParam String token, @Valid @RequestBody UserAuthorizationDTO userAuth) {
 	        authService.resetPassword(token, userAuth);
