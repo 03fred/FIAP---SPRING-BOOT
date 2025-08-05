@@ -46,14 +46,14 @@ public class ItemController implements ItemApi {
 	    return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
-	@Override 
-	@PreAuthorize("hasRole('RESTAURANT_OWNER')")		
+	@Override
+	@PreAuthorize("hasRole('RESTAURANT_OWNER')")
 	@PutMapping("/update/{id}")
 	public ResponseEntity<Map<String, String>> update(@PathVariable("id") Long id, @Valid @RequestBody ItemDTO itemDTO) {
 		itemService.update(itemDTO, id);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-	}	
-	
+	}
+
 	@Override
 	@PreAuthorize("hasRole('RESTAURANT_OWNER')")
 	@DeleteMapping("/{id}")
@@ -61,12 +61,12 @@ public class ItemController implements ItemApi {
 		itemService.delete(id);
 		return ResponseEntity.noContent().build();
 	}
-	
+
     @Override
 	@PreAuthorize("hasRole('USER')")
 	@GetMapping("/restaurant/{id}")
 	public ResponseEntity<PaginatedResponseDTO<ItemResponseDTO>> getAllMenus(@PathVariable("id") Long id, Pageable pageable) {
-		PaginatedResponseDTO<ItemResponseDTO> restaurantPage = itemService.getAllMenu(pageable, id);
+		PaginatedResponseDTO<ItemResponseDTO> restaurantPage = itemService.getAllItemsByRestaurant(pageable, id);
 		return ResponseEntity.ok(restaurantPage);
 	}
 
@@ -74,15 +74,15 @@ public class ItemController implements ItemApi {
 	@PreAuthorize("hasRole('RESTAURANT_OWNER')")
 	@GetMapping
 	public ResponseEntity<PaginatedResponseDTO<ItemResponseDTO>> getAllMenus(Pageable pageable) {
-		PaginatedResponseDTO<ItemResponseDTO> restaurantPage = itemService.getAllMenu(pageable);
+		PaginatedResponseDTO<ItemResponseDTO> restaurantPage = itemService.getAllItems(pageable);
 		return ResponseEntity.ok(restaurantPage);
 	}
-	
+
 	@Override
 	@PreAuthorize("hasRole('USER')")
 	@GetMapping("/{id}")
 	public ResponseEntity<ItemResponseDTO> findById(@PathVariable("id") Long id) {
-		return ResponseEntity.ok(itemService.getMenuById(id));
+		return ResponseEntity.ok(itemService.getItemById(id));
 	}
-	
+
 }

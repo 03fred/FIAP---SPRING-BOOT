@@ -7,19 +7,19 @@ import br.com.fiap.dto.ItemResponseDTO;
 import br.com.fiap.dto.PaginatedResponseDTO;
 
 public interface ItemService {
-	
-	void save(ItemDTO menuDTO, Long codigoRestaurante);
-	
-	void save(ItemDTO menuDTO);
 
-	ItemResponseDTO getMenuById(Long id);
+	void save(ItemDTO itemDTO, Long restaurantId);
 
-	void update(ItemDTO menuDTO, Long id);
+	void save(ItemDTO itemDTO);
+
+	ItemResponseDTO getItemById(Long id);
+
+	void update(ItemDTO itemDTO, Long id);
 
 	void delete(Long id);
 
-	PaginatedResponseDTO<ItemResponseDTO> getAllMenu(Pageable pageable);
-	
-	PaginatedResponseDTO<ItemResponseDTO> getAllMenu(Pageable pageable, Long restaurantId);
+	PaginatedResponseDTO<ItemResponseDTO> getAllItems(Pageable pageable);
+
+	PaginatedResponseDTO<ItemResponseDTO> getAllItemsByRestaurant(Pageable pageable, Long restaurantId);
 	
 }

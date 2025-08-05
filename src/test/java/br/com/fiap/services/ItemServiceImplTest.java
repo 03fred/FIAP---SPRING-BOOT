@@ -91,7 +91,7 @@ class ItemServiceImplTest {
 	public void shouldReturnMenuById() {
 		Item item = ItemFactory.createItem(1L);
 		when(ItemRepository.findById(1L)).thenReturn(Optional.of(item));
-		ItemResponseDTO result = ItemServiceImpl.getMenuById(1L);
+		ItemResponseDTO result = ItemServiceImpl.getItemById(1L);
 		assertEquals(item.getName(), result.name());
 		assertEquals(item.getDescription(), result.description());
 		assertEquals(item.getAvailability(), result.availability());
@@ -103,7 +103,7 @@ class ItemServiceImplTest {
 	public void shouldThrowWhenMenuNotFoundById() {
 		when(ItemRepository.findById(1L)).thenReturn(Optional.empty());
 
-		assertThrows(ResourceNotFoundException.class, () -> ItemServiceImpl.getMenuById(1L));
+		assertThrows(ResourceNotFoundException.class, () -> ItemServiceImpl.getItemById(1L));
 	}
 
 	@Test
@@ -163,7 +163,7 @@ class ItemServiceImplTest {
 		Page<Item> itemPage = new PageImpl<>(List.of(item));
 		when(ItemRepository.findAllByRestaurantId(authenticatedRestaurantId, pageable)).thenReturn(itemPage);
 
-		PaginatedResponseDTO<ItemResponseDTO> response = ItemServiceImpl.getAllMenu(pageable); // Era ItemServiceImpl
+		PaginatedResponseDTO<ItemResponseDTO> response = ItemServiceImpl.getAllItems(pageable); // Era ItemServiceImpl
 
 		assertNotNull(response);
 		assertEquals(1, response.getTotalElements());
