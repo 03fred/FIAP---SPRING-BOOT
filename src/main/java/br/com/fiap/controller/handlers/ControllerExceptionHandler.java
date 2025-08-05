@@ -94,4 +94,11 @@ public class ControllerExceptionHandler {
         return ResponseEntity.status(statusCode).body(new ErrorResponseDTO(ex.getMessage(), statusCode.value()));
     }
     
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponseDTO> handleIllegalArgument(IllegalArgumentException ex) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        ErrorResponseDTO error = new ErrorResponseDTO(ex.getMessage(), status.value());
+        return ResponseEntity.status(status).body(error);
+    }
+
 }
