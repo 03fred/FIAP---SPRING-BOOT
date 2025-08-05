@@ -3,6 +3,8 @@ package br.com.fiap.interfaces.swagger;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -50,4 +52,16 @@ public interface MenuApi {
 			@ApiResponse(responseCode = "400", description = "Dados inválidos"),
 			@ApiResponse(responseCode = "403", description = "Acesso não autorizado") })
 	ResponseEntity<Void> addItensMenu(@Valid @RequestBody ItemMenuDTO dto);
+	
+	@Operation(summary = "Remover item do menu",
+	        description = "Remove um item de um menu existente, desde que o usuário seja o dono do restaurante.")
+	@ApiResponses(value = {
+	        @ApiResponse(responseCode = "204", description = "Item removido do menu com sucesso"),
+	        @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+	        @ApiResponse(responseCode = "403", description = "Acesso não autorizado")
+	})
+	@DeleteMapping("/item")
+	@PreAuthorize("hasRole('RESTAURANT_OWNER')")
+	ResponseEntity<Void> removeItensMenu(@Valid @RequestBody ItemMenuDTO dto);
+
 }

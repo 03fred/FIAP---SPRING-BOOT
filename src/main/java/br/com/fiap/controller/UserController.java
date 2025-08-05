@@ -83,6 +83,7 @@ public class UserController implements UserApi {
 		return ResponseEntity.ok(userService.getUserById(id));
 	}
 
+	@Override
 	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping("/update-partial/{id}")
 	public ResponseEntity<Map<String, String>> updatePartial(
@@ -93,6 +94,7 @@ public class UserController implements UserApi {
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
+	@Override
 	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping("/update-password/{id}")
 	public ResponseEntity<Map<String, String>> updatePassword(

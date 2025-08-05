@@ -30,30 +30,35 @@ public class MenuController implements MenuApi{
     @Autowired
     private MenuService menuService;
 
+    @Override
     @PreAuthorize("hasRole('RESTAURANT_OWNER')")
     @PostMapping
     public ResponseEntity<MenuDTO> create(@RequestBody @Valid MenuCreateDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(menuService.create(dto));
     }
-
+    
+    @Override
     @PreAuthorize("hasRole('USER')")
     @GetMapping
     public ResponseEntity<List<MenuResponseDTO>> findAll() {
         return ResponseEntity.ok(menuService.findAll());
     }
 
+    @Override
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/{id}")
     public ResponseEntity<MenuResponseDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok(menuService.findById(id));
     }
-
+    
+    @Override
     @PreAuthorize("hasRole('RESTAURANT_OWNER')")
     @PutMapping("/{id}")
     public ResponseEntity<MenuDTO> update(@PathVariable Long id, @RequestBody @Valid MenuCreateDTO dto) {
         return ResponseEntity.ok(menuService.update(id, dto));
     }
-
+    
+    @Override
     @PreAuthorize("hasRole('RESTAURANT_OWNER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
@@ -61,6 +66,7 @@ public class MenuController implements MenuApi{
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
     
+    @Override
     @PreAuthorize("hasRole('RESTAURANT_OWNER')")
     @PostMapping("/item")
     public ResponseEntity<Void> addItensMenu( @RequestBody @Valid ItemMenuDTO dto) {
@@ -68,6 +74,7 @@ public class MenuController implements MenuApi{
     	return ResponseEntity.status(HttpStatus.CREATED).build();
     }
     
+    @Override
     @PreAuthorize("hasRole('RESTAURANT_OWNER')")
     @DeleteMapping("/item")
     public ResponseEntity<Void> removeItensMenu( @RequestBody @Valid ItemMenuDTO dto) {
