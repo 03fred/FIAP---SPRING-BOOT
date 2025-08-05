@@ -195,20 +195,16 @@ class MenuControllerIntegrationTest {
 	@WithMockUser(username = "Owner", roles = { "RESTAURANT_OWNER" })
 	@Transactional
 	void testGetAllMenusOwner() throws Exception {
-		   MenuResponseDTO menu1 = new MenuResponseDTO(1L, "Menu 1", 1L, List.of());
-		    MenuResponseDTO menu2 = new MenuResponseDTO(2L, "Menu 2", 1L, List.of());
+		MenuResponseDTO menu1 = new MenuResponseDTO(1L, "Menu 1", 1L, List.of());
+		MenuResponseDTO menu2 = new MenuResponseDTO(2L, "Menu 2", 1L, List.of());
 
-		    List<MenuResponseDTO> menus = List.of(menu1, menu2);
+		List<MenuResponseDTO> menus = List.of(menu1, menu2);
 
-		    Mockito.when(menuService.findAll()).thenReturn(menus);
-		    
-		 mockMvc.perform(get("/menus")
-		            .header("Authorization", "Bearer " + jwtOwner))
-		        .andExpect(status().isOk())
-		        .andExpect(jsonPath("$.length()").value(2))
-		        .andExpect(jsonPath("$[0].restaurantId").value(1L));
-		 }
-	
+		Mockito.when(menuService.findAll()).thenReturn(menus);
+
+		mockMvc.perform(get("/menus").header("Authorization", "Bearer " + jwtOwner)).andExpect(status().isOk())
+				.andExpect(jsonPath("$.length()").value(2)).andExpect(jsonPath("$[0].restaurantId").value(1L));
+	}
 	
 	@Test
 	@WithMockUser(username = "admin", roles = { "ADMIN" })
