@@ -1,7 +1,7 @@
 
 # FIAP PosTech - Backend de Usuários
 
-Este projeto é um backend desenvolvido em Spring Boot para gerenciamento de usuários, incluindo cadastro, autenticação, atualização e troca de senha. O sistema utiliza Docker Compose para facilitar a execução do ambiente com banco de dados MySQL.
+Este projeto é um backend desenvolvido em Spring Boot para gerenciamento de usuários, incluindo cadastro, autenticação, atualização e troca de senha. O sistema utiliza Docker Compose para facilitar a execução do ambiente com banco de dados MySQL. Além disso, possui controle de usuários, gerenciamento de restaurantes, inserção de menus e itens do menu, gerenciamento de perfis, controle de acessos por meio de token de autenticação e recuperação de senha via e-mail.
 
 ## 🛠️ Tecnologias
 
@@ -30,5 +30,5 @@ docker compose build
 ### 3. Subir os containers
 
 ```bash
-docker compose up
+$env:MAIL_PASSWORD = "orgg bxjb qfir enjn"; docker compose up -d
 ```
