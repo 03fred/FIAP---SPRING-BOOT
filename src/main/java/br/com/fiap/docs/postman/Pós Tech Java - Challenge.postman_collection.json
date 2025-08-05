@@ -1,0 +1,1926 @@
+{
+	"info": {
+		"_postman_id": "2647e059-8aca-401f-ab18-29fcd6fc88d0",
+		"name": "Pós Tech Java - Challenge",
+		"description": "### 🔐 Autenticação\n\nEsta API utiliza **JWT (JSON Web Token)** para autenticação. O token é obtido via login e incluído automaticamente nas requisições através de variável de coleção.\n\n🌐 **Base URL**  \n`http://localhost:8080`\n\n📌 **Endpoints Disponíveis**\n\n- `POST /users` — Criar novo usuário\n    \n- `POST /auth` — Login do usuário\n    \n- `PUT /users/{id}` — Atualizar usuário _(requer token)_\n    \n- `DELETE /users/{id}` — Deletar usuário _(requer token)_\n    \n- `GET /users` — Listar todos os usuários _(requer token)_\n    \n- `GET /users/{id}` — Buscar usuário por ID _(requer token)_",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "46899537",
+		"_collection_link": "https://fred-324508.postman.co/workspace/Personal-Workspace~f969967c-ca59-4fe8-9f34-86537053a155/collection/46899537-2647e059-8aca-401f-ab18-29fcd6fc88d0?action=share&source=collection_link&creator=46899537"
+	},
+	"item": [
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "ADMIN",
+					"item": [
+						{
+							"name": "Deletar Usuário",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8081/users/8",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"users",
+										"8"
+									]
+								},
+								"description": "## 🗑️ Deletar Usuário\n\n**DELETE /users/{id}**\n\nRemove um usuário existente com base no **ID** informado.\n\n🔐 **Requer token JWT**"
+							},
+							"response": []
+						},
+						{
+							"name": "Alterar Usuário",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"lk@gmail.com\",\r\n    \"password\": \"12345678\",\r\n    \"name\": \"Lucca Meurer\",\r\n    \"login\": \"LUK\",\r\n     \"address\" : {\r\n        \"street\" : \"rua teste\",\r\n        \"neighborhood\": \"jardins\",\r\n        \"number\": \"1\",\r\n        \"city\": \"sao paulo\",\r\n        \"state\" : \"SP\",\r\n        \"zipCode\": \"222221\"\r\n\r\n    }\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/users/update/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"users",
+										"update",
+										"1"
+									]
+								},
+								"description": "## 🔄 Alterar Usuário\n\n**PUT /users/{id}**\n\nAtualiza os dados de um usuário já existente com base no ID informado.\n\n🔐 **Requer token JWT**"
+							},
+							"response": []
+						},
+						{
+							"name": "Listar Todos Usuários",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8081/users/all?page=0&size=20&sort=id,desc",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"users",
+										"all"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										},
+										{
+											"key": "sort",
+											"value": "id,desc"
+										}
+									]
+								},
+								"description": "## 📋Listar Todos os Usuários\n\n**GET /users**\n\nRetorna a lista de todos os usuários cadastrados com paginação e ordenação.\n\n🔐 **Requer token JWT**\n\n**Parâmetros:**\n\n- `page` – número da página (ex: 0)\n    \n- `size` – quantidade de itens por página (ex: 20)\n    \n- `sort` – campo de ordenação (ex: `id,desc`)"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Criar Usuário",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"fiap@gmail.com\",\r\n    \"password\": \"123456A78\",\r\n    \"name\": \"Paulo Moura\",\r\n    \"login\": \"Paulo123\",\r\n    \"address\" : {\r\n        \"street\" : \"rua teste\",\r\n        \"neighborhood\": \"jardins\",\r\n        \"number\": \"1\",\r\n        \"city\": \"sao paulo\",\r\n        \"state\" : \"SP\",\r\n        \"zipCode\": \"222221\"\r\n\r\n    }\r\n} ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/users/create",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"users",
+								"create"
+							]
+						},
+						"description": "## 🆕 Criar Usuário\n\n**POST /users**\n\nCria um novo usuário na base de dados.\n\n🔓 **Não requer autenticação**"
+					},
+					"response": []
+				},
+				{
+					"name": "Alterar Individual",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"fiap8988@gmail.com\",\r\n    \"password\": \"123456A78\",\r\n    \"name\": \"Paulo Moura\",\r\n    \"login\": \"Paulo123\",\r\n    \"address\" : {\r\n        \"street\" : \"rua teste\",\r\n        \"neighborhood\": \"jardins\",\r\n        \"number\": \"1\",\r\n        \"city\": \"sao paulo\",\r\n        \"state\" : \"SP\",\r\n        \"zipCode\": \"222221\"\r\n\r\n    }\r\n} ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"users"
+							]
+						},
+						"description": "## 🔄 Alterar Usuário\n\n**PUT /users/{id}**\n\nAtualiza os dados de um usuário já existente com base no ID informado.\n\n🔐 **Requer token JWT**"
+					},
+					"response": []
+				},
+				{
+					"name": "Ler Usuário Específico",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/users/detail/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"users",
+								"detail",
+								"1"
+							]
+						},
+						"description": "## 🔎 Ler Usuário Específico\n\n**GET /users/{id}**\n\nRetorna os dados de um único usuário com base no **ID** informado.\n\n🔐 **Requer token JWT**"
+					},
+					"response": []
+				},
+				{
+					"name": "Alterar Senha",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"oldPassword\": \"12345678\",\r\n  \"newPassword\": \"Lucca100\",\r\n  \"confirmPassword\": \"Lucca100\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/users/update-password/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"users",
+								"update-password",
+								"2"
+							]
+						},
+						"description": "### 🔄 🔒 Alterar Senha do Usuário\n\n**PATCH** `/users/password/{id}`\n\nPermite que o usuário altere sua senha informando a senha atual e a nova senha com confirmação.\n\n🔐 **Requer token JWT**"
+					},
+					"response": []
+				},
+				{
+					"name": "Alterar Usuário Parcialmente",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Lucca\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/users/update-partial/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"users",
+								"update-partial",
+								"1"
+							]
+						},
+						"description": "### 🔄 Atualização Parcial de Usuário\n\n**PATCH** `/users/partial/{id}`\n\nAtualiza apenas campos específicos de um usuário existente (nome, e-mail, login ou endereço).\n\n🔐 **Requer token JWT**"
+					},
+					"response": []
+				}
+			],
+			"description": "📁👥 **Users**\n\nContém todas as operações relacionadas à gestão de usuários no sistema, como cadastro, consulta, atualização completa ou parcial, alteração de senha e exclusão. Todos os endpoints exigem autenticação via token JWT, exceto o cadastro."
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "ADMIN",
+					"item": [
+						{
+							"name": "Login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let jsonData = pm.response.text();\r",
+											"if(jsonData) { \r",
+											"  pm.environment.set(\"token\", jsonData);\r",
+											"  pm.collectionVariables.set(\"token\", jsonData)\r",
+											"  console.log('token salvo')\r",
+											"}else{\r",
+											"    console.log('token nao salvo')\r",
+											"}\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"identificador\": \"admin\",\r\n    \"password\": \"123\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/auth/login",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"auth",
+										"login"
+									]
+								},
+								"description": "## 🔐 Login\n\n**POST /auth**\n\nRealiza a autenticação do usuário e retorna um **token JWT**.\n\nEsse token é salvo automaticamente na variável \"`token\"` da coleção, por meio de script, e usado em todas as requisições autenticadas."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "RESTAURANT_OWNER",
+					"item": [
+						{
+							"name": "Login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let jsonData = pm.response.text();\r",
+											"if(jsonData) { \r",
+											"  pm.environment.set(\"token\", jsonData);\r",
+											"  pm.collectionVariables.set(\"token\", jsonData)\r",
+											"  console.log('token salvo')\r",
+											"}else{\r",
+											"    console.log('token nao salvo')\r",
+											"}\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"identificador\": \"Paulo123\",\r\n    \"password\": \"123456A78\",\r\n    \"restaurantId\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/auth/login",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"auth",
+										"login"
+									]
+								},
+								"description": "## 🔐 Login\n\n**POST /auth**\n\nRealiza a autenticação do usuário e retorna um **token JWT**.\n\nEsse token é salvo automaticamente na variável \"`token\"` da coleção, por meio de script, e usado em todas as requisições autenticadas."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "USER",
+					"item": [
+						{
+							"name": "Login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let jsonData = pm.response.text();\r",
+											"if(jsonData) { \r",
+											"  pm.environment.set(\"token\", jsonData);\r",
+											"  pm.collectionVariables.set(\"token\", jsonData)\r",
+											"  console.log('token salvo')\r",
+											"}else{\r",
+											"    console.log('token nao salvo')\r",
+											"}\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"identificador\": \"fiap8988@gmail.com\",\r\n    \"password\": \"123456A78\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/auth/login",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"auth",
+										"login"
+									]
+								},
+								"description": "## 🔐 Login\n\n**POST /auth**\n\nRealiza a autenticação do usuário e retorna um **token JWT**.\n\nEsse token é salvo automaticamente na variável \"`token\"` da coleção, por meio de script, e usado em todas as requisições autenticadas."
+							},
+							"response": []
+						},
+						{
+							"name": "Esqueci senha",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let jsonData = pm.response.text();\r",
+											"if(jsonData) { \r",
+											"  pm.environment.set(\"token\", jsonData);\r",
+											"  pm.collectionVariables.set(\"token\", jsonData)\r",
+											"  console.log('token salvo')\r",
+											"}else{\r",
+											"    console.log('token nao salvo')\r",
+											"}\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"identificator\": \"fiap8988@gmail.com\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/auth/forgot-password",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"auth",
+										"forgot-password"
+									]
+								},
+								"description": "## 🔐 Login\n\n**POST /auth**\n\nRealiza a autenticação do usuário e retorna um **token JWT**.\n\nEsse token é salvo automaticamente na variável \"`token\"` da coleção, por meio de script, e usado em todas as requisições autenticadas."
+							},
+							"response": []
+						},
+						{
+							"name": "Redefinir senha",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let jsonData = pm.response.text();\r",
+											"if(jsonData) { \r",
+											"  pm.environment.set(\"token\", jsonData);\r",
+											"  pm.collectionVariables.set(\"token\", jsonData)\r",
+											"  console.log('token salvo')\r",
+											"}else{\r",
+											"    console.log('token nao salvo')\r",
+											"}\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"identificador\": \"fiap8988@gmail.com\",\r\n    \"password\": \"123456A78\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/auth/reset-password?token=98dce1b5-e90f-4221-a248-6e67be1dc238",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"auth",
+										"reset-password"
+									],
+									"query": [
+										{
+											"key": "token",
+											"value": "98dce1b5-e90f-4221-a248-6e67be1dc238"
+										}
+									]
+								},
+								"description": "## 🔐 Login\n\n**POST /auth**\n\nRealiza a autenticação do usuário e retorna um **token JWT**.\n\nEsse token é salvo automaticamente na variável \"`token\"` da coleção, por meio de script, e usado em todas as requisições autenticadas."
+							},
+							"response": []
+						}
+					]
+				}
+			],
+			"description": "📁🔐 **Auth**\n\nContém os endpoints responsáveis pela autenticação de usuários. Permite o login e retorno de token JWT necessário para acessar as demais rotas protegidas do sistema."
+		},
+		{
+			"name": "ITEM",
+			"item": [
+				{
+					"name": "ADMIN",
+					"item": [
+						{
+							"name": "Criar ITEM",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"restaurante do paulo\",\r\n    \"description\": \"111\",\r\n    \"price\": \"cozinha normal\",\r\n    \"availability\": \"12:00\",\r\n    \"photo\": \"aaa\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/itens/restaurant/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"itens",
+										"restaurant",
+										"1"
+									]
+								},
+								"description": "## 🔐 Login\n\n**POST /auth**\n\nRealiza a autenticação do usuário e retorna um **token JWT**.\n\nEsse token é salvo automaticamente na variável \"`token\"` da coleção, por meio de script, e usado em todas as requisições autenticadas."
+							},
+							"response": []
+						},
+						{
+							"name": "Deletar Menu",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"restaurante do paulo\",\r\n    \"adress\": \"111\",\r\n    \"typeKitchen\": \"cozinha normal\",\r\n    \"openingHours\": \"12:00\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": ""
+								},
+								"description": "## 🔐 Login\n\n**POST /auth**\n\nRealiza a autenticação do usuário e retorna um **token JWT**.\n\nEsse token é salvo automaticamente na variável \"`token\"` da coleção, por meio de script, e usado em todas as requisições autenticadas."
+							},
+							"response": []
+						},
+						{
+							"name": "Atualizar Menu",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"restaurante do paulo\",\r\n    \"description\": \"111\",\r\n    \"price\": \"cozinha normal\",\r\n    \"availability\": \"12:00\",\r\n    \"photo\": \"bbb\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/menu/update/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"menu",
+										"update",
+										"1"
+									]
+								},
+								"description": "## 🔐 Login\n\n**POST /auth**\n\nRealiza a autenticação do usuário e retorna um **token JWT**.\n\nEsse token é salvo automaticamente na variável \"`token\"` da coleção, por meio de script, e usado em todas as requisições autenticadas."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "RESTAURANT OWNER",
+					"item": [
+						{
+							"name": "Criar Item",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"refrigerante\",\r\n    \"description\": \"pepsi zero\",\r\n    \"price\": 10.50,\r\n    \"availability\": true,\r\n    \"photo\": \"pepsi.png\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/itens/owner",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"itens",
+										"owner"
+									]
+								},
+								"description": "## 🔐 Login\n\n**POST /auth**\n\nRealiza a autenticação do usuário e retorna um **token JWT**.\n\nEsse token é salvo automaticamente na variável \"`token\"` da coleção, por meio de script, e usado em todas as requisições autenticadas."
+							},
+							"response": []
+						},
+						{
+							"name": "Deletar Item",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"restaurante do paulo\",\r\n    \"adress\": \"111\",\r\n    \"typeKitchen\": \"cozinha normal\",\r\n    \"openingHours\": \"12:00\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/menu/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"menu",
+										"1"
+									]
+								},
+								"description": "## 🔐 Login\n\n**POST /auth**\n\nRealiza a autenticação do usuário e retorna um **token JWT**.\n\nEsse token é salvo automaticamente na variável \"`token\"` da coleção, por meio de script, e usado em todas as requisições autenticadas."
+							},
+							"response": []
+						},
+						{
+							"name": "Atualizar item",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"refrigerante\",\r\n    \"description\": \"pepsi\",\r\n    \"price\": 10.50,\r\n    \"availability\": true,\r\n    \"photo\": \"pepsi.png\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/itens/update/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"itens",
+										"update",
+										"1"
+									]
+								},
+								"description": "## 🔐 Login\n\n**POST /auth**\n\nRealiza a autenticação do usuário e retorna um **token JWT**.\n\nEsse token é salvo automaticamente na variável \"`token\"` da coleção, por meio de script, e usado em todas as requisições autenticadas."
+							},
+							"response": []
+						},
+						{
+							"name": "Listar Item",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "GET http://localhost:8081/itens",
+									"protocol": "GET http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"itens"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "USER",
+					"item": [
+						{
+							"name": "Listar Menu",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/menu/restaurant/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"menu",
+										"restaurant",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "MENU",
+			"item": [
+				{
+					"name": "ADMIN",
+					"item": [
+						{
+							"name": "Criar ITEM",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"restaurante do paulo\",\r\n    \"description\": \"111\",\r\n    \"price\": \"cozinha normal\",\r\n    \"availability\": \"12:00\",\r\n    \"photo\": \"aaa\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/itens/restaurant/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"itens",
+										"restaurant",
+										"1"
+									]
+								},
+								"description": "## 🔐 Login\n\n**POST /auth**\n\nRealiza a autenticação do usuário e retorna um **token JWT**.\n\nEsse token é salvo automaticamente na variável \"`token\"` da coleção, por meio de script, e usado em todas as requisições autenticadas."
+							},
+							"response": []
+						},
+						{
+							"name": "Deletar Menu",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"restaurante do paulo\",\r\n    \"adress\": \"111\",\r\n    \"typeKitchen\": \"cozinha normal\",\r\n    \"openingHours\": \"12:00\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": ""
+								},
+								"description": "## 🔐 Login\n\n**POST /auth**\n\nRealiza a autenticação do usuário e retorna um **token JWT**.\n\nEsse token é salvo automaticamente na variável \"`token\"` da coleção, por meio de script, e usado em todas as requisições autenticadas."
+							},
+							"response": []
+						},
+						{
+							"name": "Atualizar Menu",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"restaurante do paulo\",\r\n    \"description\": \"111\",\r\n    \"price\": \"cozinha normal\",\r\n    \"availability\": \"12:00\",\r\n    \"photo\": \"bbb\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/menu/update/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"menu",
+										"update",
+										"1"
+									]
+								},
+								"description": "## 🔐 Login\n\n**POST /auth**\n\nRealiza a autenticação do usuário e retorna um **token JWT**.\n\nEsse token é salvo automaticamente na variável \"`token\"` da coleção, por meio de script, e usado em todas as requisições autenticadas."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "RESTAURANT OWNER",
+					"item": [
+						{
+							"name": "Criar Menu",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"title\": \"menu quinta feira\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/menus",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"menus"
+									]
+								},
+								"description": "## 🔐 Login\n\n**POST /auth**\n\nRealiza a autenticação do usuário e retorna um **token JWT**.\n\nEsse token é salvo automaticamente na variável \"`token\"` da coleção, por meio de script, e usado em todas as requisições autenticadas."
+							},
+							"response": []
+						},
+						{
+							"name": "ADD ITEM / MENU",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"itemId\": 1,\r\n    \"menuId\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/menus/item",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"menus",
+										"item"
+									]
+								},
+								"description": "## 🔐 Login\n\n**POST /auth**\n\nRealiza a autenticação do usuário e retorna um **token JWT**.\n\nEsse token é salvo automaticamente na variável \"`token\"` da coleção, por meio de script, e usado em todas as requisições autenticadas."
+							},
+							"response": []
+						},
+						{
+							"name": "DELETAR ITEM /MENU",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"itemId\": 1,\r\n    \"menuId\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/menus/item",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"menus",
+										"item"
+									]
+								},
+								"description": "## 🔐 Login\n\n**POST /auth**\n\nRealiza a autenticação do usuário e retorna um **token JWT**.\n\nEsse token é salvo automaticamente na variável \"`token\"` da coleção, por meio de script, e usado em todas as requisições autenticadas."
+							},
+							"response": []
+						},
+						{
+							"name": "Deletar Menu",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/menus/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"menus",
+										"1"
+									]
+								},
+								"description": "## 🔐 Login\n\n**POST /auth**\n\nRealiza a autenticação do usuário e retorna um **token JWT**.\n\nEsse token é salvo automaticamente na variável \"`token\"` da coleção, por meio de script, e usado em todas as requisições autenticadas."
+							},
+							"response": []
+						},
+						{
+							"name": "Atualizar Menu",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"title\": \"menu quarta feira\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/menus/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"menus",
+										"1"
+									]
+								},
+								"description": "## 🔐 Login\n\n**POST /auth**\n\nRealiza a autenticação do usuário e retorna um **token JWT**.\n\nEsse token é salvo automaticamente na variável \"`token\"` da coleção, por meio de script, e usado em todas as requisições autenticadas."
+							},
+							"response": []
+						},
+						{
+							"name": "Listar Menu",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/menus",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"menus"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "USER",
+					"item": [
+						{
+							"name": "Listar Menu",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/menu/restaurant/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"menu",
+										"restaurant",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Restaurant",
+			"item": [
+				{
+					"name": "ADMIN",
+					"item": [
+						{
+							"name": "Criar Restaurante",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"restaurante do paulo\",\r\n    \"adress\": \"111\",\r\n    \"typeKitchen\": \"cozinha normal\",\r\n    \"openingTime\": \"12:00\",\r\n    \"closingTime\": \"08:00\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/restaurant/user/owner/2",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"restaurant",
+										"user",
+										"owner",
+										"2"
+									]
+								},
+								"description": "## 🔐 Login\n\n**POST /auth**\n\nRealiza a autenticação do usuário e retorna um **token JWT**.\n\nEsse token é salvo automaticamente na variável \"`token\"` da coleção, por meio de script, e usado em todas as requisições autenticadas."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "RESTAURANT OWNER",
+					"item": [
+						{
+							"name": "Listar restaurantes",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/restaurant?page=0&size=20&sort=id,desc",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"restaurant"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										},
+										{
+											"key": "sort",
+											"value": "id,desc"
+										}
+									]
+								},
+								"description": "## 🔐 Login\n\n**POST /auth**\n\nRealiza a autenticação do usuário e retorna um **token JWT**.\n\nEsse token é salvo automaticamente na variável \"`token\"` da coleção, por meio de script, e usado em todas as requisições autenticadas."
+							},
+							"response": []
+						},
+						{
+							"name": "Criar Restaurante",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"restaurante TESTE\",\r\n    \"adress\": \"123\",\r\n    \"typeKitchen\": \"cozinha diferente\",\r\n    \"openingTime\": \"11:00\",\r\n    \"closingTime\": \"22:00\"\r\n} ",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/restaurant",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"restaurant"
+									]
+								},
+								"description": "## 🔐 Login\n\n**POST /auth**\n\nRealiza a autenticação do usuário e retorna um **token JWT**.\n\nEsse token é salvo automaticamente na variável \"`token\"` da coleção, por meio de script, e usado em todas as requisições autenticadas."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "USER",
+					"item": [
+						{
+							"name": "Listar todos os restaurantes",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/restaurant/all?page=0&size=20&sort=id,desc",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"restaurant",
+										"all"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										},
+										{
+											"key": "sort",
+											"value": "id,desc"
+										}
+									]
+								},
+								"description": "## 🔐 Login\n\n**POST /auth**\n\nRealiza a autenticação do usuário e retorna um **token JWT**.\n\nEsse token é salvo automaticamente na variável \"`token\"` da coleção, por meio de script, e usado em todas as requisições autenticadas."
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Users Role",
+			"item": [
+				{
+					"name": "ADMIN",
+					"item": [
+						{
+							"name": "delete permission",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"login\": \"Paulo123\",\r\n    \"role\": \"ADMIN\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/users_type",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"users_type"
+									]
+								},
+								"description": "## 🔄 Alterar Usuário\n\n**PUT /users/{id}**\n\nAtualiza os dados de um usuário já existente com base no ID informado.\n\n🔐 **Requer token JWT**"
+							},
+							"response": []
+						},
+						{
+							"name": "save permission",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"login\": \"Paulo123\",\r\n    \"role\": \"RESTAURANT_OWNER\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/users_type",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"users_type"
+									]
+								},
+								"description": "## 🔄 Alterar Usuário\n\n**PUT /users/{id}**\n\nAtualiza os dados de um usuário já existente com base no ID informado.\n\n🔐 **Requer token JWT**"
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer"
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

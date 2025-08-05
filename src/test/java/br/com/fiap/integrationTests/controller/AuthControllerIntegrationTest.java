@@ -1,5 +1,6 @@
-package br.com.fiap.controller;
+package br.com.fiap.integrationTests.controller;
 
+import br.com.fiap.controller.AuthController;
 import br.com.fiap.exceptions.ResourceNotFoundException;
 import br.com.fiap.interfaces.services.AuthService;
 import br.com.fiap.model.User;
@@ -20,7 +21,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class AuthControllerTest {
+class AuthControllerIntegrationTest {
 
     @Mock
     private AuthService authService;

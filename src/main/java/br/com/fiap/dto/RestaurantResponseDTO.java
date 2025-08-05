@@ -1,8 +1,11 @@
 package br.com.fiap.dto;
 
+import java.time.LocalTime;
+
 public record RestaurantResponseDTO(
 		String name,
 		String adress,
 		String typeKitchen,
-		String openingHours) {
+		LocalTime OpeningTime,
+		LocalTime ClosingTime) {
 }

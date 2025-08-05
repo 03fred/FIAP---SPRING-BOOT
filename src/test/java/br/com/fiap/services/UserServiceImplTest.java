@@ -1,18 +1,20 @@
 package br.com.fiap.services;
 
-import static br.com.fiap.factory.UserFactory.UserUpdateDTOMock;
-import static br.com.fiap.factory.UserFactory.createUserDTOMock;
-import static br.com.fiap.factory.UserFactory.createUserMock;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.List;
-import java.util.Optional;
-
+import br.com.fiap.dto.PaginatedResponseDTO;
+import br.com.fiap.dto.PasswordUpdateDTO;
+import br.com.fiap.dto.UserDTO;
+import br.com.fiap.dto.UserPartialUpdateDTO;
+import br.com.fiap.dto.UserResponseDTO;
+import br.com.fiap.dto.UserUpdateDTO;
+import br.com.fiap.exceptions.ConflictException;
+import br.com.fiap.exceptions.ResourceNotFoundException;
+import br.com.fiap.factory.AddressFactory;
+import br.com.fiap.interfaces.repositories.RoleRepository;
+import br.com.fiap.interfaces.repositories.UserRepository;
+import br.com.fiap.model.Restaurant;
+import br.com.fiap.model.Role;
+import br.com.fiap.model.User;
+import br.com.fiap.model.enums.EnumUserType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,19 +26,25 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import br.com.fiap.dto.PaginatedResponseDTO;
-import br.com.fiap.dto.PasswordUpdateDTO;
-import br.com.fiap.dto.UserDTO;
-import br.com.fiap.dto.UserPartialUpdateDTO;
-import br.com.fiap.dto.UserResponseDTO;
-import br.com.fiap.dto.UserUpdateDTO;
-import br.com.fiap.exceptions.ConflictException;
-import br.com.fiap.exceptions.ResourceNotFoundException;
-import br.com.fiap.interfaces.repositories.RoleRepository;
-import br.com.fiap.interfaces.repositories.UserRepository;
-import br.com.fiap.model.Role;
-import br.com.fiap.model.User;
-import br.com.fiap.model.enums.EnumUserType;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import static br.com.fiap.factory.UserFactory.UserUpdateDTOMock;
+import static br.com.fiap.factory.UserFactory.createUserDTOMock;
+import static br.com.fiap.factory.UserFactory.createUserMock;
+import static br.com.fiap.factory.UserFactory.getUser;
+import static br.com.fiap.factory.UserFactory.getUserDTO;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
@@ -99,7 +107,13 @@ class UserServiceImplTest {
         assertEquals(dto.email(), user.getEmail());
         assertEquals(dto.name(), user.getName());
         assertEquals(dto.login(), user.getLogin());
-        assertEquals(dto.address(), user.getAddress());
+        assertEquals(dto.address().street(), user.getAddress().getStreet());
+        assertEquals(dto.address().number(), user.getAddress().getNumber());
+        assertEquals(dto.address().neighborhood(), user.getAddress().getNeighborhood());
+        assertEquals(dto.address().city(), user.getAddress().getCity());
+        assertEquals(dto.address().state(), user.getAddress().getState());
+        assertEquals(dto.address().zipCode(), user.getAddress().getZipCode());
+
     }
 
     @Test
@@ -133,7 +147,7 @@ class UserServiceImplTest {
         user.setId(1L);
         user.setEmail("a@a.com");
         user.setName("Ana");
-        user.setAddress("Rua 1");
+        user.setAddress(AddressFactory.getMockAddress(user));
         Pageable pageable = PageRequest.of(0, 10);
         Page<User> page = new PageImpl<>(List.of(user));
 
@@ -225,7 +239,7 @@ class UserServiceImplTest {
     @Test
     void shouldUpdateUserPartially() {
         User user = createUserMock();
-        UserPartialUpdateDTO dto = new UserPartialUpdateDTO("Nova Ana", "novo@email.com", "rua nova", "novoLogin");
+        UserPartialUpdateDTO dto = new UserPartialUpdateDTO("Nova Ana", "novo@email.com", "rua nova", AddressFactory.getMockAddressDTO());
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(userRepository.existsByEmail(dto.email())).thenReturn(false);
@@ -235,7 +249,13 @@ class UserServiceImplTest {
 
         assertEquals(dto.name(), user.getName());
         assertEquals(dto.email(), user.getEmail());
-        assertEquals(dto.address(), user.getAddress());
+        assertEquals(dto.address().street(), user.getAddress().getStreet());
+        assertEquals(dto.address().number(), user.getAddress().getNumber());
+        assertEquals(dto.address().neighborhood(), user.getAddress().getNeighborhood());
+        assertEquals(dto.address().city(), user.getAddress().getCity());
+        assertEquals(dto.address().state(), user.getAddress().getState());
+        assertEquals(dto.address().zipCode(), user.getAddress().getZipCode());
+
         assertEquals(dto.login(), user.getLogin());
         verify(userRepository).save(user);
     }
@@ -254,10 +274,17 @@ class UserServiceImplTest {
     @Test
     void shouldThrowWhenPartialUpdateLoginExists() {
         User user = createUserMock();
-        UserPartialUpdateDTO dto = new UserPartialUpdateDTO(null, null, null, "loginDuplicado");
+        user.setLogin("originalLogin");
+
+        UserPartialUpdateDTO dto = new UserPartialUpdateDTO(
+                "Novo Nome",
+                "novo@email.com",
+                "loginEmUso",
+                AddressFactory.getMockAddressDTO()
+        );
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(userRepository.existsByLogin(dto.login())).thenReturn(true);
+        when(userRepository.existsByLogin("loginEmUso")).thenReturn(true);
 
         assertThrows(ConflictException.class, () -> userService.updatePartial(1L, dto));
     }
@@ -265,10 +292,74 @@ class UserServiceImplTest {
     @Test
     void shouldThrowWhenNoFieldsToUpdate() {
         User user = createUserMock();
-        UserPartialUpdateDTO dto = new UserPartialUpdateDTO(" ", " ", " ", " ");
+        UserPartialUpdateDTO dto = new UserPartialUpdateDTO(" ", " ", " ", AddressFactory.getEmptyAddressDTO());
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
         assertThrows(IllegalArgumentException.class, () -> userService.updatePartial(1L, dto));
+    }
+
+    @Test
+    void testConstructorFromUserDTO() {
+        UserDTO userDTO = getUserDTO();
+
+        User user = new User(userDTO);
+
+        assertEquals("John Doe", user.getName());
+        assertEquals("john.doe@example.com", user.getEmail());
+        assertEquals("johndoe", user.getLogin());
+        assertEquals(userDTO.address(), user.getAddress().toDTO());
+        assertNotNull(user.getDtUpdateRow());
+    }
+
+    @Test
+    void testAllArgsConstructor() {
+        Role role = new Role("USER");
+        Set<Role> roles = Set.of(role);
+        List<Restaurant> restaurants = new ArrayList<>();
+        Date updateDate = new Date();
+
+        User user = getUser(roles, restaurants, updateDate);
+
+        assertEquals(1L, user.getId());
+        assertEquals("Jane Doe", user.getName());
+        assertEquals("jane.doe@example.com", user.getEmail());
+        assertEquals("janedoe", user.getLogin());
+        assertEquals("pass123", user.getPassword());
+        assertEquals(updateDate, user.getDtUpdateRow());
+        assertEquals(AddressFactory.getMockAddress(), user.getAddress());
+        assertEquals(roles, user.getUserTypesRoles());
+        assertEquals(restaurants, user.getRestaurant());
+    }
+
+    @Test
+    void testRemoveRole() {
+        Role role1 = new Role("USER");
+        Role role2 = new Role("ADMIN");
+
+        User user = new User();
+        user.getUserTypesRoles().add(role1);
+        user.getUserTypesRoles().add(role2);
+
+        assertEquals(2, user.getUserTypesRoles().size());
+
+        user.removeRole(role1);
+
+        assertEquals(1, user.getUserTypesRoles().size());
+        assertFalse(user.getUserTypesRoles().contains(role1));
+        assertTrue(user.getUserTypesRoles().contains(role2));
+    }
+
+    @Test
+    void testOnUpdate() throws InterruptedException {
+        User user = new User();
+        Date beforeUpdate = new Date();
+
+        Thread.sleep(10);
+        user.onUpdate();
+        Date afterUpdate = user.getDtUpdateRow();
+
+        assertNotNull(afterUpdate);
+        assertTrue(afterUpdate.after(beforeUpdate));
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import br.com.fiap.interfaces.services.AuthService;
+import br.com.fiap.model.AuthenticatedUser;
 import br.com.fiap.model.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -30,9 +31,16 @@ public class JwtFilter  extends OncePerRequestFilter{
 		String token = buildRequestToken(request);
 
 		if (token != null && JwtTokenUtil.parseToken(token) != null) {
-			String login = JwtTokenUtil.getAuthentication(token);
+			
+			String login = JwtTokenUtil.getLogin(token);
+			Long restaurantId = JwtTokenUtil.getRestaurantId(token);
+
 			User user = this.authService.getUserByLogin(login);
-			Authentication authentication = new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities());
+
+			AuthenticatedUser authenticatedUser = new AuthenticatedUser(restaurantId, user.getName(), user.getLogin(),
+					user.getId(), user.getUserTypesRoles());
+			
+			Authentication authentication = new UsernamePasswordAuthenticationToken(authenticatedUser, "", authenticatedUser.getAuthorities());
 			
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 		} else {

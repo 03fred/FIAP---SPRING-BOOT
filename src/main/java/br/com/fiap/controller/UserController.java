@@ -2,7 +2,6 @@ package br.com.fiap.controller;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,9 +31,12 @@ import jakarta.validation.Valid;
 @RequestMapping(value = "/users", produces = {"application/json"})
 public class UserController implements UserApi { 
 
-	@Autowired
-	private UserService userService;
-	
+	private final UserService userService;
+
+	public UserController(UserService userService) {
+		this.userService = userService;
+	}
+	        
 	@Override
 	@PostMapping("/create")
 	public ResponseEntity<Map<String, String>> save(@Valid @RequestBody UserDTO userDto) {
@@ -47,7 +49,7 @@ public class UserController implements UserApi {
 	@PutMapping("/update/{id}")
 	public ResponseEntity<Map<String, String>> update(@PathVariable("id") Long id, @Valid @RequestBody UserUpdateDTO userUpdateDTO) {
 		userService.update(userUpdateDTO, id);
-		return ResponseEntity.ok(Map.of("mensagem", "Usuário atualizado com sucesso."));
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
 	@Override 
@@ -55,7 +57,7 @@ public class UserController implements UserApi {
 	@PutMapping
 	public ResponseEntity<Map<String, String>> update(@Valid @RequestBody UserDTO userDto) {
 		userService.update(userDto);
-		return ResponseEntity.ok(Map.of("mensagem", "Usuário atualizado com sucesso."));
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 	
 	@Override 
@@ -63,7 +65,7 @@ public class UserController implements UserApi {
 	@DeleteMapping("/delete/{id}")
 	public ResponseEntity<Map<String, String>> delete(@PathVariable("id") Long id){
 		userService.delete(id);
-		return ResponseEntity.ok(Map.of("mensagem", "Usuário excluído com sucesso."));
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
 	@Override 
@@ -81,22 +83,25 @@ public class UserController implements UserApi {
 		return ResponseEntity.ok(userService.getUserById(id));
 	}
 
+	@Override
+	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping("/update-partial/{id}")
 	public ResponseEntity<Map<String, String>> updatePartial(
 			@PathVariable Long id,
 			@RequestBody UserPartialUpdateDTO dto) {
 
 		userService.updatePartial(id, dto);
-		return ResponseEntity.ok(Map.of("message", "Campo atualizado com sucesso."));
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
-
+	@Override
+	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping("/update-password/{id}")
 	public ResponseEntity<Map<String, String>> updatePassword(
 			@PathVariable Long id,
 			@Valid @RequestBody PasswordUpdateDTO dto) {
 		userService.updatePassword(id, dto);
-		return ResponseEntity.ok(Map.of("mensagem", "Senha atualizada com sucesso."));
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
 }

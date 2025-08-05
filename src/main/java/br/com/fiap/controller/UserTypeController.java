@@ -26,6 +26,7 @@ public class UserTypeController implements UserTypeApi{
 		this.service = service;
 	}
 
+	@Override
 	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping
 	public ResponseEntity<Map<String, String>> save(@Valid @RequestBody UserTypeDTO userType) {
@@ -33,7 +34,7 @@ public class UserTypeController implements UserTypeApi{
 		return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("mensagem", "Permissão cadastrada com sucesso!"));
 	}
 	
-	
+	@Override
 	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping
 	public ResponseEntity<Map<String, String>> delete(@Valid @RequestBody UserTypeDTO userType) {

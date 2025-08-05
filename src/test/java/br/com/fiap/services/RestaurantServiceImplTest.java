@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -110,7 +111,9 @@ public class RestaurantServiceImplTest {
                 "Maria",
                 "Address 2",
                 "Italian",
-                "5 pm"
+                LocalTime.of(17, 0),
+                LocalTime.of(23, 0)
+
         );
 
         restaurantServiceImpl.update(restaurantDTO, restaurant.getId());

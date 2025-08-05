@@ -1,11 +1,14 @@
 package br.com.fiap.interfaces.repositories;
 
-import br.com.fiap.model.Menu;
+
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import br.com.fiap.model.Menu;
 
-public interface MenuRepository extends JpaRepository<Menu, Long>{
-
-    Optional<Menu> findById(Long id);
+@Repository
+public interface MenuRepository extends JpaRepository<Menu, Long> {
+    List<Menu> findByRestaurantId(Long restaurantId);
 }

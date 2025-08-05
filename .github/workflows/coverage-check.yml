@@ -1,8 +1,10 @@
-name: Validate Coverage Before Merge
+name: Validate Coverage Before Merge[teste]
 
 on:
+  push:
+    branches: [ develop ]
   pull_request:
-    branches: [ master ]
+    branches: [ develop, main ]
 
 jobs:
   build-and-check-coverage:

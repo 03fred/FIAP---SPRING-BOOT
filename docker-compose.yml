@@ -7,22 +7,32 @@ services:
       MYSQL_DATABASE: challenge
       MYSQL_ROOT_PASSWORD: Senharoot@123
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysql -hlocalhost -uroot -pSenharoot@123 -e 'SELECT 1'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   app:
     build: .
     container_name: springboot-app
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/challenge?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: Senharoot@123
       SPRING_PROFILES_ACTIVE: prod
+
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+
     ports:
-      - "8080:8080"
+      - "8081:8080"
 
 volumes:
   mysql_data:

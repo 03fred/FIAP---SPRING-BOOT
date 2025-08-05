@@ -1,8 +1,11 @@
 package br.com.fiap.dto;
 
+import jakarta.validation.Valid;
+
 public record UserPartialUpdateDTO(
         String name,
         String email,
-        String address,
-        String login
+        String login,
+        @Valid
+        AddressDTO address
 ){}

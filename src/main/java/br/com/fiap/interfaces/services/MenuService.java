@@ -1,19 +1,18 @@
 package br.com.fiap.interfaces.services;
 
+import java.util.List;
+
+import br.com.fiap.dto.ItemMenuDTO;
+import br.com.fiap.dto.MenuCreateDTO;
 import br.com.fiap.dto.MenuDTO;
 import br.com.fiap.dto.MenuResponseDTO;
-import br.com.fiap.dto.PaginatedResponseDTO;
-import org.springframework.data.domain.Pageable;
 
 public interface MenuService {
-	
-	void save(MenuDTO menuDTO, Long codigoRestaurante);
-
-	MenuResponseDTO getMenuById(Long id);
-
-	void update(MenuDTO menuDTO, Long id);
-
-	void delete(Long id);
-
-	PaginatedResponseDTO<MenuResponseDTO> getAllMenu(Pageable pageable);
+    MenuDTO create(MenuCreateDTO dto);
+    List<MenuResponseDTO> findAll();
+    MenuResponseDTO findById(Long id);
+    MenuDTO update(Long id, MenuCreateDTO dto);
+    void delete(Long id);
+    void addItemToMenu(ItemMenuDTO dto);
+    void removeItemFromMenu(ItemMenuDTO dto);
 }
