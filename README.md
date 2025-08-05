@@ -30,5 +30,5 @@ docker compose build
 ### 3. Subir os containers
 
 ```bash
-$env:MAIL_PASSWORD = "orgg bxjb qfir enjn"; docker compose up -d
+Windows $env:MAIL_PASSWORD = "orgg bxjb qfir enjn"; docker compose up -d || linux MAIL_PASSWORD="orgg bxjb qfir enjn" docker compose up
 ```
