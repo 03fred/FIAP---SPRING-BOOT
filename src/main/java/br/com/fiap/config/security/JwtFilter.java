@@ -8,9 +8,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import br.com.fiap.interfaces.services.AuthService;
-import br.com.fiap.model.AuthenticatedUser;
-import br.com.fiap.model.User;
+import br.com.fiap.application.useCases.AuthService;
+import br.com.fiap.domain.entities.AuthenticatedUser;
+import br.com.fiap.domain.entities.User;
+import br.com.fiap.domain.gateways.TokenGateway;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,9 +21,11 @@ import jakarta.servlet.http.HttpServletResponse;
 public class JwtFilter  extends OncePerRequestFilter{
 	
 	 private AuthService authService;
+	 private TokenGateway tokenGateway;
 	 
-	 private JwtFilter (AuthService authService) {
+	 private JwtFilter (AuthService authService, TokenGateway tokenGateway) {
 		 this.authService = authService;
+		 this.tokenGateway = tokenGateway;
 	 }
 	 
 	@Override
@@ -30,10 +33,10 @@ public class JwtFilter  extends OncePerRequestFilter{
 			throws ServletException, IOException {
 		String token = buildRequestToken(request);
 
-		if (token != null && JwtTokenUtil.parseToken(token) != null) {
+		if (token != null && tokenGateway.validateJwtToken(token)) {
 			
-			String login = JwtTokenUtil.getLogin(token);
-			Long restaurantId = JwtTokenUtil.getRestaurantId(token);
+			String login = tokenGateway.extractUsernameFromJwt(token);
+			Long restaurantId = tokenGateway.extractRestaurantIdFromJwt(token);
 
 			User user = this.authService.getUserByLogin(login);
 

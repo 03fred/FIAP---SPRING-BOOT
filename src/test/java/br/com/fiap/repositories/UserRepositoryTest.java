@@ -14,8 +14,8 @@ import org.springframework.test.context.TestPropertySource;
 
 import br.com.fiap.dto.AddressDTO;
 import br.com.fiap.dto.UserDTO;
-import br.com.fiap.interfaces.repositories.UserRepository;
-import br.com.fiap.model.User;
+import br.com.fiap.domain.repositories.UserRepository;
+import br.com.fiap.domain.entities.User;
 
 @TestPropertySource(properties = { "spring.jpa.hibernate.ddl-auto=create-drop" })
 @ActiveProfiles("test")

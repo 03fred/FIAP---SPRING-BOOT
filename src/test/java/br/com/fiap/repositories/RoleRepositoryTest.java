@@ -11,8 +11,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
-import br.com.fiap.interfaces.repositories.RoleRepository;
-import br.com.fiap.model.Role;
+import br.com.fiap.domain.repositories.RoleRepository;
+import br.com.fiap.domain.entities.Role;
 
 @TestPropertySource(properties = { "spring.jpa.hibernate.ddl-auto=create-drop" })
 @ActiveProfiles("test")

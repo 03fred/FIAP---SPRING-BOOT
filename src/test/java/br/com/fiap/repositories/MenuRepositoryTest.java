@@ -14,14 +14,14 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 import br.com.fiap.factory.AddressFactory;
-import br.com.fiap.interfaces.repositories.MenuRepository;
-import br.com.fiap.interfaces.repositories.RestaurantRepository;
-import br.com.fiap.interfaces.repositories.RoleRepository;
-import br.com.fiap.interfaces.repositories.UserRepository;
-import br.com.fiap.model.Menu;
-import br.com.fiap.model.Restaurant;
-import br.com.fiap.model.Role;
-import br.com.fiap.model.User;
+import br.com.fiap.domain.repositories.MenuRepository;
+import br.com.fiap.domain.repositories.RestaurantRepository;
+import br.com.fiap.domain.repositories.RoleRepository;
+import br.com.fiap.domain.repositories.UserRepository;
+import br.com.fiap.domain.entities.Menu;
+import br.com.fiap.domain.entities.Restaurant;
+import br.com.fiap.domain.entities.Role;
+import br.com.fiap.domain.entities.User;
 
 @TestPropertySource(properties = { "spring.jpa.hibernate.ddl-auto=create-drop" })
 @ActiveProfiles("test")

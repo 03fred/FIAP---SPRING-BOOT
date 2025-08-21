@@ -1,8 +1,8 @@
 package br.com.fiap.mapper;
 
 import br.com.fiap.dto.AddressDTO;
-import br.com.fiap.model.Address;
-import br.com.fiap.model.User;
+import br.com.fiap.domain.entities.Address;
+import br.com.fiap.domain.entities.User;
 
 public class AddressMapper {
 

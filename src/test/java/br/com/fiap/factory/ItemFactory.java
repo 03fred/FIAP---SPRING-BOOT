@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 import br.com.fiap.dto.ItemDTO;
 import br.com.fiap.dto.ItemResponseDTO;
-import br.com.fiap.model.Item;
+import br.com.fiap.domain.entities.Item;
 
 public class ItemFactory {
 

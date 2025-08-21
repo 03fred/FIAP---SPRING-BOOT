@@ -31,14 +31,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.fiap.config.security.JwtTokenUtil;
 import br.com.fiap.dto.ItemDTO;
-import br.com.fiap.interfaces.repositories.ItemRepository;
-import br.com.fiap.interfaces.repositories.RestaurantRepository;
-import br.com.fiap.interfaces.repositories.RoleRepository;
-import br.com.fiap.interfaces.repositories.UserRepository;
-import br.com.fiap.model.Item;
-import br.com.fiap.model.Restaurant;
-import br.com.fiap.model.Role;
-import br.com.fiap.model.User;
+import br.com.fiap.domain.repositories.ItemRepository;
+import br.com.fiap.domain.repositories.RestaurantRepository;
+import br.com.fiap.domain.repositories.RoleRepository;
+import br.com.fiap.domain.repositories.UserRepository;
+import br.com.fiap.domain.entities.Item;
+import br.com.fiap.domain.entities.Restaurant;
+import br.com.fiap.domain.entities.Role;
+import br.com.fiap.domain.entities.User;
 import jakarta.transaction.Transactional;
 
 @SpringBootTest

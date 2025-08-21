@@ -17,7 +17,7 @@ import java.util.UUID;
 
 import br.com.fiap.dto.*;
 import br.com.fiap.factory.AddressFactory;
-import br.com.fiap.model.Address;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +35,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.fiap.config.security.JwtTokenUtil;
-import br.com.fiap.interfaces.repositories.RoleRepository;
-import br.com.fiap.interfaces.repositories.UserRepository;
-import br.com.fiap.model.Role;
-import br.com.fiap.model.User;
+import br.com.fiap.domain.repositories.RoleRepository;
+import br.com.fiap.domain.repositories.UserRepository;
+import br.com.fiap.domain.entities.Address;
+import br.com.fiap.domain.entities.Role;
+import br.com.fiap.domain.entities.User;
 import jakarta.transaction.Transactional;
 
 @SpringBootTest

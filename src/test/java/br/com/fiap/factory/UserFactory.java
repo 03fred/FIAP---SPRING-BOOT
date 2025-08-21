@@ -2,9 +2,9 @@ package br.com.fiap.factory;
 
 import br.com.fiap.dto.UserDTO;
 import br.com.fiap.dto.UserUpdateDTO;
-import br.com.fiap.model.Restaurant;
-import br.com.fiap.model.Role;
-import br.com.fiap.model.User;
+import br.com.fiap.domain.entities.Restaurant;
+import br.com.fiap.domain.entities.Role;
+import br.com.fiap.domain.entities.User;
 
 import java.util.Date;
 import java.util.List;

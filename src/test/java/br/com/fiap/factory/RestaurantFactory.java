@@ -2,7 +2,7 @@ package br.com.fiap.factory;
 
 import br.com.fiap.dto.RestaurantDTO;
 import br.com.fiap.dto.RestaurantResponseDTO;
-import br.com.fiap.model.Restaurant;
+import br.com.fiap.domain.entities.Restaurant;
 
 import java.time.LocalTime;
 import java.util.ArrayList;

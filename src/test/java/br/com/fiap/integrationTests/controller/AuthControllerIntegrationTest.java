@@ -1,9 +1,9 @@
 package br.com.fiap.integrationTests.controller;
 
-import br.com.fiap.controller.AuthController;
+import br.com.fiap.interfaces.controllers.AuthController;
 import br.com.fiap.exceptions.ResourceNotFoundException;
-import br.com.fiap.interfaces.services.AuthService;
-import br.com.fiap.model.User;
+import br.com.fiap.application.useCases.AuthService;
+import br.com.fiap.domain.entities.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

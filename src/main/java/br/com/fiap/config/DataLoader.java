@@ -3,17 +3,17 @@ package br.com.fiap.config;
 import java.util.HashSet;
 import java.util.Set;
 
-import br.com.fiap.model.Address;
+import br.com.fiap.domain.entities.Address;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional; // Importante!
-
-import br.com.fiap.interfaces.repositories.RoleRepository;
-import br.com.fiap.interfaces.repositories.UserRepository;
-import br.com.fiap.model.Role;
-import br.com.fiap.model.User;
-import br.com.fiap.model.enums.EnumUserType;
+import br.com.fiap.domain.entities.Address;
+import br.com.fiap.domain.repositories.RoleRepository;
+import br.com.fiap.domain.repositories.UserRepository;
+import br.com.fiap.domain.entities.Role;
+import br.com.fiap.domain.entities.User;
+import br.com.fiap.domain.enums.EnumUserType;
 
 @Component
 public class DataLoader implements CommandLineRunner {
