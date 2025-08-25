@@ -1,42 +1,97 @@
 package br.com.fiap.domain.entities;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Date;
+import java.util.Objects;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
+import br.com.fiap.dto.UserDTO;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode
-@ToString
-@Entity
-@Table(name = "password_reset_token") 
+
 public class PasswordResetToken {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	private static final long serialVersionUID = 1L;
+	
+	private Long id;
 
-    private String token;
+	private String email;
 
-    @OneToOne
-    private User user;
+	private String name;
 
-    private LocalDateTime expiration;
+	private String login;
 
-    public boolean isExpired() {
-        return LocalDateTime.now().isAfter(expiration);
-    }
+	private String password;
+
+	private Date dtUpdateRow;
+
+	public void onUpdate() {
+		this.dtUpdateRow = new Date();
+	}
+
+	//private Address address;
+
+	//private Set<Role> userTypesRoles = new HashSet<>();
+
+	//private List<Restaurant> restaurant;
+
+	public PasswordResetToken(UserDTO userDto, String passwordCrypto) {
+		this.email = userDto.email();
+		this.name = userDto.name();
+		this.login = userDto.login();
+		this.password = passwordCrypto;
+		this.dtUpdateRow = new Date();
+
+//		AddressDTO ad = userDto.address();
+		/*
+		 * this.address = new Address( null, ad.street(), ad.number(),
+		 * ad.neighborhood(), ad.city(), ad.state(), ad.zipCode(), this );
+		 */
+	}
+
+	public PasswordResetToken(UserDTO userDto) {
+		this.email = userDto.email();
+		this.name = userDto.name();
+		this.login = userDto.login();
+		this.dtUpdateRow = new Date();
+
+		/*
+		 * AddressDTO ad = userDto.address(); this.address = new Address( null,
+		 * ad.street(), ad.number(), ad.neighborhood(), ad.city(), ad.state(),
+		 * ad.zipCode(), this );
+		 */
+	}
+
+	/*public void removeRole(Role role) {
+		this.userTypesRoles.remove(role);
+	}*/
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(email, id, login);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PasswordResetToken other = (PasswordResetToken) obj;
+		return Objects.equals(email, other.email) && Objects.equals(id, other.id) && Objects.equals(login, other.login);
+	}
+
+	public PasswordResetToken(Long id, String email, String name, String login, String password, Date dtUpdateRow) {
+		super();
+		this.id = id;
+		this.email = email;
+		this.name = name;
+		this.login = login;
+		this.password = password;
+		this.dtUpdateRow = dtUpdateRow;
+	
+	}
+
 }

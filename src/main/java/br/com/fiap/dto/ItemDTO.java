@@ -16,7 +16,6 @@ public record ItemDTO(
 
 		@NotNull(message = "Necessário informar a disponibilidade para pedir apenas no restaurante")
 		Boolean availability,
-		
 
 		@NotNull(message = "Necessário informar o caminho da imagem")
 		String photo) {

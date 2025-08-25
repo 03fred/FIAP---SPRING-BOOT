@@ -1,28 +1,15 @@
 package br.com.fiap.config;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import br.com.fiap.domain.entities.Address;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional; // Importante!
-import br.com.fiap.domain.entities.Address;
-import br.com.fiap.domain.repositories.RoleRepository;
-import br.com.fiap.domain.repositories.UserRepository;
-import br.com.fiap.domain.entities.Role;
-import br.com.fiap.domain.entities.User;
-import br.com.fiap.domain.enums.EnumUserType;
 
 @Component
-public class DataLoader implements CommandLineRunner {
+public class DataLoader /*implements CommandLineRunner*/ {
 
-	UserRepository userRepository;
+	/*JpaUserRepository userRepository;
 	PasswordEncoder passwordEncoder;
 	RoleRepository roleRepository;
 	
-	public DataLoader(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
+	public DataLoader(JpaUserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
 		this.userRepository = userRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.roleRepository = roleRepository;
@@ -73,5 +60,5 @@ public class DataLoader implements CommandLineRunner {
 				System.out.println("Admin user already exists.");
 			}
 	
-    }
+    }*/
 }

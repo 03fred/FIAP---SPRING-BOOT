@@ -1,48 +1,35 @@
 package br.com.fiap.mapper;
 
-import br.com.fiap.dto.AddressDTO;
 import br.com.fiap.domain.entities.Address;
-import br.com.fiap.domain.entities.User;
+import br.com.fiap.infrastructure.persistence.address.JpaAddressEntity;
 
 public class AddressMapper {
 
-    public static AddressDTO toDTO(Address address) {
+    public static JpaAddressEntity toEntity(Address address) {
         if (address == null) return null;
-
-        return new AddressDTO(
-                address.getStreet(),
-                address.getNumber(),
-                address.getNeighborhood(),
-                address.getCity(),
-                address.getState(),
-                address.getZipCode()
+        return new JpaAddressEntity(
+            address.getId(),
+            address.getStreet(),
+            address.getNumber(),
+            address.getNeighborhood(),
+            address.getCity(),
+            address.getState(),
+            address.getZipCode(),
+            UserMapper.toEntity(address.getUser())
         );
     }
 
-    public static Address toEntity(AddressDTO dto, User user) {
-        if (dto == null) return null;
-
+    public static Address toDomain(JpaAddressEntity entity) {
+        if (entity == null) return null;
         return new Address(
-                null,
-                dto.street(),
-                dto.number(),
-                dto.neighborhood(),
-                dto.city(),
-                dto.state(),
-                dto.zipCode(),
-                user
+            entity.getId(),
+            entity.getStreet(),
+            entity.getNumber(),
+            entity.getNeighborhood(),
+            entity.getCity(),
+            entity.getState(),
+            entity.getZipCode(),
+            UserMapper.toDomain(entity.getUser())
         );
     }
-
-    public static boolean isEmpty(AddressDTO dto) {
-        return dto == null || (
-                (dto.city() == null || dto.city().isBlank()) &&
-                        (dto.state() == null || dto.state().isBlank()) &&
-                        (dto.street() == null || dto.street().isBlank()) &&
-                        (dto.neighborhood() == null || dto.neighborhood().isBlank()) &&
-                        (dto.zipCode() == null || dto.zipCode().isBlank())
-        );
-    }
-
-
 }

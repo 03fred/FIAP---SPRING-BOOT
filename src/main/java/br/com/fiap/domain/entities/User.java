@@ -1,136 +1,70 @@
 package br.com.fiap.domain.entities;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import br.com.fiap.dto.AddressDTO;
 import br.com.fiap.dto.UserDTO;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PUBLIC)
-@ToString
-@Entity 
-@Table(name = "users") 
+
 public class User {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
+	
+	private Long id;
 
-	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	private String email;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+	private String name;
 
-    @Column(nullable = false)
-    private String name;
+	private String login;
 
-    @Column(nullable = false, unique = true)
-    private String login;
+	private String password;
 
-    @Column(nullable = false)
-    private String password;
+	private Date dtUpdateRow;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "dt_update_row")
-    private Date dtUpdateRow;
+	public void onUpdate() {
+		this.dtUpdateRow = new Date();
+	}
 
-    @PreUpdate
-    public void onUpdate() {
-        this.dtUpdateRow = new Date();
-    }
+	//private Address address;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "address_id", referencedColumnName = "id")
-    private Address address;
+	//private Set<Role> userTypesRoles = new HashSet<>();
 
+	//private List<Restaurant> restaurant;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinTable(
-        name = "user_types_roles",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> userTypesRoles = new HashSet<>(); 
+	public User(UserDTO userDto, String passwordCrypto) {
+		this.email = userDto.email();
+		this.name = userDto.name();
+		this.login = userDto.login();
+		this.password = passwordCrypto;
+		this.dtUpdateRow = new Date();
 
-    @JsonBackReference
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @OneToMany(mappedBy = "restaurantOwner", fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<Restaurant> restaurant;
+//		AddressDTO ad = userDto.address();
+		/*
+		 * this.address = new Address( null, ad.street(), ad.number(),
+		 * ad.neighborhood(), ad.city(), ad.state(), ad.zipCode(), this );
+		 */
+	}
 
+	public User(UserDTO userDto) {
+		this.email = userDto.email();
+		this.name = userDto.name();
+		this.login = userDto.login();
+		this.dtUpdateRow = new Date();
 
-    public User(UserDTO userDto, String passwordCrypto) {
-        this.email = userDto.email();
-        this.name = userDto.name();
-        this.login = userDto.login();
-        this.password = passwordCrypto;
-        this.dtUpdateRow = new Date();
+		/*
+		 * AddressDTO ad = userDto.address(); this.address = new Address( null,
+		 * ad.street(), ad.number(), ad.neighborhood(), ad.city(), ad.state(),
+		 * ad.zipCode(), this );
+		 */
+	}
 
-        AddressDTO ad = userDto.address();
-        this.address = new Address(
-                null,
-                ad.street(),
-                ad.number(),
-                ad.neighborhood(),
-                ad.city(),
-                ad.state(),
-                ad.zipCode(),
-                this
-        );
-    }
-
-    public User(UserDTO userDto) {
-        this.email = userDto.email();
-        this.name = userDto.name();
-        this.login = userDto.login();
-        this.dtUpdateRow = new Date();
-
-        AddressDTO ad = userDto.address();
-        this.address = new Address(
-                null,
-                ad.street(),
-                ad.number(),
-                ad.neighborhood(),
-                ad.city(),
-                ad.state(),
-                ad.zipCode(),
-                this
-        );
-    }
-
-
-    public void removeRole(Role role) {
-        this.userTypesRoles.remove(role);
-    }
+	/*public void removeRole(Role role) {
+		this.userTypesRoles.remove(role);
+	}*/
 
 	@Override
 	public int hashCode() {
@@ -148,6 +82,16 @@ public class User {
 		User other = (User) obj;
 		return Objects.equals(email, other.email) && Objects.equals(id, other.id) && Objects.equals(login, other.login);
 	}
-    
-    
+
+	public User(Long id, String email, String name, String login, String password, Date dtUpdateRow) {
+		super();
+		this.id = id;
+		this.email = email;
+		this.name = name;
+		this.login = login;
+		this.password = password;
+		this.dtUpdateRow = dtUpdateRow;
+	
+	}
+
 }
