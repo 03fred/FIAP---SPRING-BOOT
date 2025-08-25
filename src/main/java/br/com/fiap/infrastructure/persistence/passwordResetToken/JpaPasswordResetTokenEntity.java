@@ -1,12 +1,13 @@
 package br.com.fiap.infrastructure.persistence.passwordResetToken;
 
-import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
-import jakarta.persistence.Column;
+import br.com.fiap.infrastructure.persistence.user.JpaUserEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -22,30 +23,20 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 @Entity
-@Table(name = "itens")
-public class JpaPasswordResetTokenEntity{
-
+@Table(name = "password_reset_token") 
+public class JpaPasswordResetTokenEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String name;
+    private String token;
 
-    @Column(nullable = false)
-    private String description;
+    @OneToOne
+    private JpaUserEntity user;
 
-    @Column(nullable = false)
-    private BigDecimal price;
+    private LocalDateTime expiration;
 
-    @Column(nullable = false)
-    private Boolean availability;
-
-    @Column
-    private String photo;
-
- /*   @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "restaurant_id", nullable = false)
-    private Restaurant restaurant;*/
-
+    public boolean isExpired() {
+        return LocalDateTime.now().isAfter(expiration);
+    }
 }

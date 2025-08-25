@@ -1,8 +1,9 @@
 package br.com.fiap.gateways;
 
-import br.com.fiap.infrastructure.persistence.passwordResetToken.JpaPasswordResetTokenEntity;
+import br.com.fiap.domain.entities.PasswordResetToken;
 
 public interface PasswordResetTokenRepository {
-	 JpaPasswordResetTokenEntity findByToken(String token);
+	PasswordResetToken findByToken(String token);
+	PasswordResetToken save(PasswordResetToken passwordResetToken);
 
 }

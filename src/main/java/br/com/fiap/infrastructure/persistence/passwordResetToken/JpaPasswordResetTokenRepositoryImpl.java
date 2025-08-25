@@ -1,27 +1,36 @@
 package br.com.fiap.infrastructure.persistence.passwordResetToken;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import br.com.fiap.domain.entities.PasswordResetToken;
+import br.com.fiap.exceptions.ResourceNotFoundException;
 import br.com.fiap.gateways.PasswordResetTokenRepository;
+import br.com.fiap.mapper.PasswordResetTokenMapper;
+
 
 @Repository
 public class JpaPasswordResetTokenRepositoryImpl implements PasswordResetTokenRepository {
-    
-    @Autowired
+
     private JpaPasswordResetTokenRepository jpaRepo;
-    
-    public JpaPasswordResetTokenRepositoryImpl(JpaPasswordResetTokenRepository jpaRepo) {
-    	this.jpaRepo = jpaRepo;
+
+    JpaPasswordResetTokenRepositoryImpl(JpaPasswordResetTokenRepository jpaRepo) {
+        this.jpaRepo = jpaRepo;
     }
 
+
 	@Override
-	public JpaPasswordResetTokenEntity findByToken(String token) {
+	public PasswordResetToken findByToken(String token) {
 		JpaPasswordResetTokenEntity resetToken = jpaRepo.findByToken(token)
-	            .orElseThrow(() -> new IllegalArgumentException("Token inválido"));
-		
-		return resetToken;
+				   .orElseThrow(() -> new ResourceNotFoundException("Token Invalido"));
+		return PasswordResetTokenMapper.toDomain(resetToken);
 	}
 
+	
+	@Override
+	public PasswordResetToken save(PasswordResetToken passwordResetToken) {
+		var entity = jpaRepo.save(PasswordResetTokenMapper.toEntity(passwordResetToken));
+		return PasswordResetTokenMapper.toDomain(entity);
+
+	}
     
 }

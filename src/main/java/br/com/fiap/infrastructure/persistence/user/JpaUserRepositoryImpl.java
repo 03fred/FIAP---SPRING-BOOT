@@ -1,9 +1,10 @@
 package br.com.fiap.infrastructure.persistence.user;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import br.com.fiap.domain.entities.User;
@@ -17,6 +18,10 @@ public class JpaUserRepositoryImpl implements UserRepository {
     @Autowired
     private JpaUserRepository jpaRepo;
     
+    private JpaUserRepositoryImpl(JpaUserRepository jpaRepo)
+    {
+    	this.jpaRepo = jpaRepo;
+    }
     JpaUserEntity user;
     
 	@Override
@@ -26,45 +31,35 @@ public class JpaUserRepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	public Optional<User> findByEmail(String email) {
-		 jpaRepo.findByEmail(email)
-				.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o email: " + email));
-		 return Optional.ofNullable(UserMapper.toDomain(user));
+	public User findByEmail(String email) {
+		JpaUserEntity entity = jpaRepo.findByEmail(email)
+				   .orElseThrow(() -> new ResourceNotFoundException("Token Invalido"));
+		return UserMapper.toDomain(entity);
 	}
 
 	@Override
-	public Optional<User> findByLogin(String login) {
-		// TODO Auto-generated method stub
-		return Optional.empty();
+	public User findByLogin(String login) {
+		JpaUserEntity entity = jpaRepo.findByLogin(login)
+				   .orElseThrow(() -> new ResourceNotFoundException("Token Invalido"));
+		return UserMapper.toDomain(entity);
 	}
 
 	@Override
-	public boolean existsByEmail(String email) {
-		// TODO Auto-generated method stub
-		return false;
+	public User findById(Long id) {
+		JpaUserEntity entity = jpaRepo.findById(id)
+				   .orElseThrow(() -> new ResourceNotFoundException("Token Invalido"));
+		return UserMapper.toDomain(entity);
 	}
 
 	@Override
-	public boolean existsByLogin(String login) {
-		// TODO Auto-generated method stub
-		return false;
+	public List<User> findAll(int page, int size) {
+		Pageable pageable = PageRequest.of(page, size);
+		return jpaRepo.findAll(pageable).map(UserMapper::toDomain).toList();
 	}
 
 	@Override
-	public Optional<User> findById(Long id) {
-		// TODO Auto-generated method stub
-		return Optional.empty();
-	}
-
-	@Override
-	public List<User> findAll() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void deleteById(Long id) {
-		// TODO Auto-generated method stub
+	public void deleteById(User user) {
+	   jpaRepo.deleteById(user.getId());
 		
 	}
     

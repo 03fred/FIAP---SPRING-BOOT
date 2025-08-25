@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import br.com.fiap.domain.entities.Menu;
+import br.com.fiap.exceptions.ResourceNotFoundException;
 import br.com.fiap.gateways.MenuRepository;
 import br.com.fiap.mapper.MenuMapper;
 
@@ -16,40 +17,29 @@ public class JpaMenuRepositoryImpl implements MenuRepository {
 
 	@Autowired
 	private JpaMenuRepository jpaRepo;
-	
+
 	@Override
 	public List<Menu> findByRestaurantId(Long restaurantId, int page, int size) {
 		Pageable pageable = PageRequest.of(page, size);
 		return jpaRepo.findAllByRestaurantId(restaurantId, pageable).map(MenuMapper::toDomain).toList();
 	}
-}
-	/*
+
 	@Override
-	public PaginatedResponseDTO<MenuResponseDTO> findByRestaurantId(Long restaurantId, int page, int size) {
-	    Pageable pageable = PageRequest.of(page, size);
+	public Menu findById(Long id) {
+		JpaMenuEntity entity = jpaRepo.findById(id)
+	            .orElseThrow(() -> new ResourceNotFoundException("Menu não encontrado"));
+		return MenuMapper.toDomain(entity);
+		
+	}
 
-	    Page<MenuResponseDTO> menuPage = jpaRepo.findAllByRestaurantId(restaurantId, pageable)
-	            .map(menu -> new MenuResponseDTO(
-	                menu.getId(),
-	                menu.getTitle(),
-	                menu.getRestaurant().getId(),
-	                menu.getItems().stream()
-	                    .map(item -> new ItemDTO(
-	                        item.getName(),
-	                        item.getDescription(),
-	                        item.getPrice(),
-	                        item.getAvailability(),
-	                        item.getPhoto()
-	                    ))
-	                    .toList()
-	            ));
+	@Override
+	public Menu save(Menu menu) {
+		return MenuMapper.toDomain(jpaRepo.save(MenuMapper.toEntity(menu)));
+	}
 
-	        return new PaginatedResponseDTO<>(
-	            menuPage.getContent(),
-	            menuPage.getTotalElements(),
-	            menuPage.getNumber(),
-	            menuPage.getSize()
-			);
-		}
+	@Override
+	public void delete(Menu menu) {
+		jpaRepo.deleteById(menu.getId());
 
-	}*/
+	}
+}
